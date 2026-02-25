@@ -81,9 +81,7 @@ export function checkModelSupport() {
     )
   }
 
-  const crossOriginIsolated = typeof crossOriginIsolated !== 'undefined'
-    ? window.crossOriginIsolated
-    : false
+  const crossOriginIsolated = window.crossOriginIsolated ?? false
 
   const navigator_memory = navigator.deviceMemory
   if (navigator_memory !== undefined && navigator_memory < 4) {

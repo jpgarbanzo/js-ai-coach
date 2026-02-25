@@ -67,9 +67,10 @@ function SlideViewer({ slides = [], currentIndex = 0, onNavigate }) {
       </div>
 
       {/* Content */}
-      <div className="slide-content card-body">
-        <SlideContent content={slide.content} />
-      </div>
+      <div
+        className="slide-content card-body"
+        dangerouslySetInnerHTML={{ __html: slide.content ?? '' }}
+      />
 
       {/* Navigation footer */}
       <div className="slide-footer">
@@ -221,112 +222,5 @@ function SlideViewer({ slides = [], currentIndex = 0, onNavigate }) {
   )
 }
 
-/**
- * Simple Markdown-ish content renderer.
- * Handles code blocks, inline code, headers, bold, italic, lists.
- * For a real project consider adding a proper Markdown library.
- */
-function SlideContent({ content }) {
-  if (!content) return null
-
-  // Split content into blocks on double newlines
-  const blocks = content
-    .trim()
-    .split(/\n{2,}/)
-    .filter(Boolean)
-
-  return (
-    <div className="slide-content-body">
-      {blocks.map((block, i) => renderBlock(block, i))}
-    </div>
-  )
-}
-
-function renderBlock(block, key) {
-  // Fenced code block: ```lang\ncode\n```
-  const codeBlockMatch = block.match(/^```(\w*)\n([\s\S]*?)\n?```$/)
-  if (codeBlockMatch) {
-    const [, lang, code] = codeBlockMatch
-    return (
-      <pre key={key} data-lang={lang || 'js'}>
-        <code>{code}</code>
-      </pre>
-    )
-  }
-
-  // Heading: # ## ###
-  const headingMatch = block.match(/^(#{1,4})\s+(.+)$/)
-  if (headingMatch) {
-    const level = headingMatch[1].length
-    const text = headingMatch[2]
-    const Tag = `h${Math.min(level + 2, 6)}`
-    return <Tag key={key}>{renderInline(text)}</Tag>
-  }
-
-  // Unordered list
-  if (block.match(/^[-*]\s+/m)) {
-    const items = block.split('\n').filter((l) => l.match(/^[-*]\s+/))
-    return (
-      <ul key={key}>
-        {items.map((item, j) => (
-          <li key={j}>{renderInline(item.replace(/^[-*]\s+/, ''))}</li>
-        ))}
-      </ul>
-    )
-  }
-
-  // Ordered list
-  if (block.match(/^\d+\.\s+/m)) {
-    const items = block.split('\n').filter((l) => l.match(/^\d+\.\s+/))
-    return (
-      <ol key={key}>
-        {items.map((item, j) => (
-          <li key={j}>{renderInline(item.replace(/^\d+\.\s+/, ''))}</li>
-        ))}
-      </ol>
-    )
-  }
-
-  // Blockquote
-  if (block.startsWith('> ')) {
-    return (
-      <blockquote key={key}>
-        {renderInline(block.replace(/^>\s?/gm, ''))}
-      </blockquote>
-    )
-  }
-
-  // Default: paragraph
-  return <p key={key}>{renderInline(block)}</p>
-}
-
-function renderInline(text) {
-  // Split on inline code, bold, italic markers
-  const parts = []
-  const regex = /(`[^`]+`|\*\*[^*]+\*\*|\*[^*]+\*)/g
-  let lastIndex = 0
-  let match
-
-  while ((match = regex.exec(text)) !== null) {
-    if (match.index > lastIndex) {
-      parts.push(text.slice(lastIndex, match.index))
-    }
-    const token = match[0]
-    if (token.startsWith('`')) {
-      parts.push(<code key={match.index}>{token.slice(1, -1)}</code>)
-    } else if (token.startsWith('**')) {
-      parts.push(<strong key={match.index}>{token.slice(2, -2)}</strong>)
-    } else if (token.startsWith('*')) {
-      parts.push(<em key={match.index}>{token.slice(1, -1)}</em>)
-    }
-    lastIndex = match.index + token.length
-  }
-
-  if (lastIndex < text.length) {
-    parts.push(text.slice(lastIndex))
-  }
-
-  return parts.length === 1 && typeof parts[0] === 'string' ? parts[0] : parts
-}
 
 export default SlideViewer
