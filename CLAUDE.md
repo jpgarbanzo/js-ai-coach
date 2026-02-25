@@ -1,188 +1,149 @@
-# CLAUDE.md — JS AI Coach Project North Star
+# CLAUDE.md
 
-## Project Purpose
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-JS AI Coach is an interactive JavaScript learning platform that teaches JS through structured lessons and hands-on exercises. An AI coaching layer (powered by Transformers.js running locally in the browser via ONNX/WebAssembly) provides hints and feedback without requiring any backend server. The app runs entirely client-side and deploys to GitHub Pages.
+## Commands
 
-## Tech Stack
+```bash
+npm run dev          # Vite dev server → http://localhost:5173/js-ai-coach/
+npm run build        # Production build to dist/
+npm test             # Run all tests once (Vitest)
+npm run test:watch   # Watch mode
+npm run test:coverage
+npm run lint         # ESLint (0 errors expected)
+npm run lint:fix
+npm run format       # Prettier
+```
 
-| Layer | Technology |
-|---|---|
-| UI Framework | React 18 (no TypeScript — plain JS/JSX only) |
-| Build Tool | Vite 6 |
-| Code Editor | CodeMirror 6 via @uiw/react-codemirror |
-| AI / Inference | @huggingface/transformers (ONNX, runs in-browser) |
-| Testing | Vitest + @testing-library/react + jsdom |
-| Linting | ESLint 9 (flat config) + eslint-plugin-react + eslint-plugin-react-hooks |
-| Formatting | Prettier |
-| Deployment | GitHub Pages via GitHub Actions |
+To run a single test file:
+```bash
+npx vitest run src/tests/evaluator.test.js
+```
 
 ## Architecture
 
-### Views (state-based routing — no React Router)
+### Routing
+State-based routing in `App.jsx` — no React Router. `view` state is one of `'home' | 'lesson' | 'troubleshoot'`. `navigateTo(view, lesson?)` is passed down as a prop.
 
+### Component tree
 ```
 App
-├── Navigation          — top nav bar, model selector
-├── HomePage            — lesson list / landing page
-├── LessonPage          — renders a single lesson
-│   ├── SlideViewer     — slide-by-slide lesson content (Markdown-ish)
-│   ├── ExercisePanel   — code editor + run/check/hint buttons
-│   └── AICoachPanel    — hint/feedback display from the loaded model
-└── TroubleshootPage    — model loading diagnostics, browser feature checks
+├── Navigation          top bar, model selector dropdown
+├── HomePage            lesson card grid with progress bars
+├── LessonPage          lesson view: slides + exercises tabs
+│   ├── SlideViewer     prev/next slide navigation, keyboard arrows
+│   ├── ExercisePanel   CodeMirror editor, run/check, test results, hints
+│   └── AICoachPanel    load model, get hint / get feedback buttons
+└── TroubleshootPage    browser capability checks, model test loader
 ```
 
-### Key Data Flow
+### Lesson data flow
+1. `src/lessons/index.js` imports all 11 lesson modules, exports `LESSONS` array and `getLessonById(id)`.
+2. Each lesson file exports a default object (see schema below).
+3. `LessonPage` extracts exercises with:
+   ```js
+   const exercises = lesson.exercises?.length
+     ? lesson.exercises
+     : lesson.slides.filter(s => s.hasExercise).map(s => s.exercise)
+   ```
+   This supports both a top-level `exercises` array and exercises embedded in slides.
+4. `ExercisePanel` calls `evaluateCode(code, testCases, setupCode)` from `src/utils/evaluator.js`.
+5. Test results and compilation errors flow up to `LessonPage` via `onTestResults` / `onError` props, then into `AICoachPanel` as context for hints.
 
-1. Lessons are imported from `src/lessons/index.js` which re-exports all lesson modules.
-2. Each lesson module exports an object matching the Lesson schema (see below).
-3. The user writes code in the ExercisePanel (CodeMirror editor).
-4. On "Run" or "Check", `evaluateCode()` (src/utils/evaluator.js) runs the code sandboxed via the `Function` constructor and executes test cases.
-5. If a model is loaded and the user asks for a hint, `getHint()` (src/utils/aiCoach.js) calls the in-browser pipeline.
-6. Progress is persisted to localStorage via src/utils/storage.js.
+### Code evaluation (src/utils/evaluator.js)
+Two test case formats are supported:
 
-## Directory Structure
-
+**String format** (used by all lesson files):
+```js
+{ description: 'add(1,2) returns 3', test: 'return add(1, 2) === 3' }
 ```
-js-ai-coach/
-├── public/
-│   └── favicon.svg
-├── src/
-│   ├── components/
-│   │   ├── Navigation.jsx
-│   │   ├── HomePage.jsx
-│   │   ├── LessonPage.jsx
-│   │   ├── SlideViewer.jsx
-│   │   ├── ExercisePanel.jsx
-│   │   ├── AICoachPanel.jsx
-│   │   └── TroubleshootPage.jsx
-│   ├── lessons/
-│   │   ├── index.js          — re-exports all lessons
-│   │   └── lesson-01-variables/
-│   │       └── index.js
-│   ├── styles/
-│   │   └── global.css
-│   ├── tests/
-│   │   ├── setup.js
-│   │   ├── evaluator.test.js
-│   │   └── storage.test.js
-│   ├── utils/
-│   │   ├── evaluator.js
-│   │   ├── aiCoach.js
-│   │   └── storage.js
-│   ├── App.jsx
-│   └── main.jsx
-├── .gitignore
-├── .prettierrc
-├── CLAUDE.md
-├── eslint.config.js
-├── index.html
-├── package.json
-├── README.md
-└── vite.config.js
+Executed as `new Function(setupCode + '\n' + userCode + '\n' + testString)()`. User code is re-run per test; top-level functions and variables are in scope without needing `exports`.
+
+**Function format** (for programmatic use):
+```js
+{ description: 'exports value', test: (exports) => exports.result === 42 }
 ```
+User code runs once; values must be assigned to `exports.myVar = ...`.
 
-## Lesson Schema
+The sandbox has no access to `window`, `document`, or module scope.
 
-Each lesson file must export a default object matching this shape:
+### AI Coach (src/utils/aiCoach.js)
+Uses `@huggingface/transformers` to run ONNX models entirely in-browser. Models are downloaded on first use and cached in the browser's Cache Storage.
+
+| ID | Model | Size |
+|---|---|---|
+| `none` | No Coach (pass/fail only) | — |
+| `tiny` | HuggingFaceTB/SmolLM2-135M-Instruct | ~270 MB |
+| `small` | microsoft/Phi-3-mini-4k-instruct | ~7.6 GB |
+
+`loadModel(modelId, onProgress)` caches the pipeline in module scope. `getHint(model, exercise, userCode, errorContext)` and `evaluateSolution(model, exercise, userCode, testResults)` are the two AI entry points.
+
+### Persistence (src/utils/storage.js)
+localStorage only. Keys: model preference, per-exercise code (`lessonId:exerciseId`), completed exercise set, and a progress map used by `HomePage` for progress bars.
+
+## Lesson schema
+
+All 11 lessons live in `src/lessons/lesson-NN.js`. The actual schema used:
 
 ```js
 export default {
-  id: 'lesson-01-variables',         // unique kebab-case id
-  title: 'Variables y Tipos de Datos', // lesson title (Spanish OK)
-  description: 'Aprende sobre var, let y const', // short description
+  id: '01',                // two-digit string
+  title: 'Introduction to JavaScript',
+  description: 'Short description',
+  icon: '🎯',
   slides: [
     {
-      id: 'slide-1',
-      title: 'Introducción',
-      content: `Markdown-ish string explaining the concept`,
+      id: 'slide-01-1',
+      title: 'Slide Title',
+      content: `<p>HTML content</p><div class="code-block">code here</div>`,
+      hasExercise: false,
     },
-    // ...
-  ],
-  exercises: [
     {
-      id: 'ex-1',
-      title: 'Declara una variable',
-      description: 'Crea una variable llamada nombre con el valor "Juan"',
-      initialCode: `// Tu código aquí\n`,
-      setupCode: ``,          // run before user code (optional helpers)
-      testCases: [
-        {
-          description: 'nombre debe ser "Juan"',
-          test: (exported) => exported.nombre === 'Juan',
-        },
-      ],
-      hints: ['Usa let o const', 'Asigna el valor con ='],
-      solution: `const nombre = 'Juan'`,
+      id: 'slide-01-2',
+      title: 'Exercise Slide',
+      content: `<p>...</p>`,
+      hasExercise: true,
+      exercise: {
+        id: 'ex-01-1',
+        title: 'Exercise Title',
+        description: 'One-line description shown in the header',
+        instructions: `<p>HTML instructions with <code>code</code> inline</p>`,
+        starterCode: `// Starter code shown in editor\nfunction foo() {\n  // your code\n}`,
+        solution: `function foo() { return 42 }`,
+        hints: ['Hint 1', 'Hint 2', 'Hint 3'],
+        testCases: [
+          {
+            description: 'foo() returns 42',
+            test: `return foo() === 42`,   // string; runs in same scope as userCode
+            input: '(none)',
+            expected: '42',
+          },
+        ],
+        difficulty: 'beginner',            // beginner | intermediate | advanced
+        concepts: ['functions', 'return'],
+      },
     },
   ],
 }
 ```
 
-## AI Model Options
+`ExercisePanel` reads `exercise.starterCode` (with `exercise.initialCode` as fallback).
 
-Models run entirely in-browser via @huggingface/transformers (ONNX). They are downloaded on first use and cached in the browser's Cache Storage (IndexedDB-backed).
+## Key conventions
 
-| ID | Name | HuggingFace ID | VRAM (approx) | Notes |
-|---|---|---|---|---|
-| `none` | No Coach | — | 0 MB | Pass/fail only, no hints |
-| `tiny` | SmolLM2-135M | HuggingFaceTB/SmolLM2-135M-Instruct | ~270 MB | Fast, lower quality hints |
-| `small` | Phi-3-mini | microsoft/Phi-3-mini-4k-instruct | ~7600 MB | Better hints, slower load |
-
-Model is selected by the user in the Navigation bar and persisted in localStorage. The TroubleshootPage shows browser capability diagnostics.
-
-## Exercise Evaluation
-
-Exercises are evaluated client-side without any sandbox iframe. The approach:
-
-1. User code is wrapped in a `Function` constructor: `new Function('exports', userCode)`
-2. An `exports` object is passed in so user code can export values: `exports.myVar = ...`
-3. Each test case is a function `(exported) => boolean` run against the exports object
-4. Results are collected: `{passed, description, actual, expected, error}`
-5. A simple timeout via `Promise.race` prevents infinite loops
-
-Example evaluator call:
-```js
-const result = await evaluateCode(userCode, testCases, setupCode)
-// result: { passed: true, results: [{passed, description, actual, error}] }
-```
+- **No TypeScript** — plain JS and JSX only; `react/prop-types` is disabled in ESLint
+- **No React Router** — `useState`-based view switching in `App.jsx`
+- **CSS** — plain CSS with custom properties in `src/styles/global.css`; no CSS-in-JS or Tailwind
+- **State** — `useState` / `useReducer` only; no external state library
+- **Imports** — always use explicit `.jsx` or `.js` extensions
+- **ESLint** — flat config (`eslint.config.js`); `no-console` warns but allows `console.warn` / `console.error`
+- **Vite base** — `/js-ai-coach/`; all asset paths must account for this (affects `public/` references)
 
 ## Deployment
 
-- GitHub Actions workflow at `.github/workflows/deploy.yml`
-- Triggers on push to `main`
-- Runs `npm ci && npm run build`
-- Deploys `dist/` to the `gh-pages` branch
-- Live URL: https://jpgarbanzo.github.io/js-ai-coach/
-- Vite base path is set to `/js-ai-coach/` in vite.config.js
+GitHub Actions (`.github/workflows/deploy.yml`) triggers on push to `main`:
+`npm ci` → lint → test → `npm run build` → deploy `dist/` via `actions/deploy-pages@v4`
 
-## Key Conventions
+Live URL: **https://jpgarbanzo.github.io/js-ai-coach/**
 
-- **No TypeScript** — plain JS and JSX only
-- **No React Router** — simple `useState`-based view switching in App.jsx
-- **Lesson content** — keep Spanish text from source material; UI chrome in English
-- **CSS** — plain CSS with custom properties (CSS variables); no CSS-in-JS, no Tailwind
-- **State management** — React `useState` / `useReducer` only; no Redux / Zustand
-- **Imports** — always use explicit `.jsx` or `.js` extensions in imports
-- **Tests** — co-locate test files in `src/tests/`; use Vitest + Testing Library
-- **ESLint** — flat config (eslint.config.js); `react/prop-types` is OFF intentionally
-- **No console.log** in production code (ESLint warns); `console.warn` / `console.error` are allowed
-
-## Local Development
-
-```bash
-npm install
-npm run dev        # starts Vite dev server at http://localhost:5173/js-ai-coach/
-npm test           # run tests once
-npm run test:watch # watch mode
-npm run lint       # check linting
-npm run format     # format with prettier
-```
-
-## Common Pitfalls
-
-- The Vite `base` is `/js-ai-coach/` — all asset paths must account for this
-- Transformers.js needs `SharedArrayBuffer` in some modes; the TroubleshootPage documents this
-- Model weights are large — always warn users before downloading
-- The `Function` constructor sandbox does NOT have access to `window`, `document`, or module scope — this is intentional
-- Test files import `@testing-library/jest-dom` via the setup file (src/tests/setup.js)
+Vite produces content-hashed filenames for automatic cache busting.

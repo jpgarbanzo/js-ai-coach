@@ -18,7 +18,7 @@ import { getSavedCode, saveCode, markExerciseCompleted, isExerciseCompleted } fr
  */
 function ExercisePanel({ exercise, lessonId, onTestResults, onError }) {
   const savedCode = getSavedCode(lessonId, exercise.id)
-  const [code, setCode] = useState(savedCode ?? exercise.initialCode ?? '')
+  const [code, setCode] = useState(savedCode ?? exercise.starterCode ?? exercise.initialCode ?? '')
   const [results, setResults] = useState(null)
   const [isRunning, setIsRunning] = useState(false)
   const [compilationError, setCompilationError] = useState(null)
@@ -60,11 +60,11 @@ function ExercisePanel({ exercise, lessonId, onTestResults, onError }) {
   }
 
   const handleReset = () => {
-    setCode(exercise.initialCode ?? '')
+    setCode(exercise.starterCode ?? exercise.initialCode ?? '')
     setResults(null)
     setCompilationError(null)
     setShowSolution(false)
-    saveCode(lessonId, exercise.id, exercise.initialCode ?? '')
+    saveCode(lessonId, exercise.id, exercise.starterCode ?? exercise.initialCode ?? '')
     if (onTestResults) onTestResults(null)
     if (onError) onError(null)
   }

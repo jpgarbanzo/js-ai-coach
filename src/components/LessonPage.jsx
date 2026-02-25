@@ -20,9 +20,13 @@ function LessonPage({ lesson, navigateTo, selectedModel }) {
   const [testResults, setTestResults] = useState(null)
   const [errorContext, setErrorContext] = useState(null)
 
+  // Support both a top-level `exercises` array and exercises embedded in slides
+  const exercises = lesson.exercises?.length
+    ? lesson.exercises
+    : (lesson.slides ?? []).filter((s) => s.hasExercise).map((s) => s.exercise)
   const hasSlides = lesson.slides && lesson.slides.length > 0
-  const hasExercises = lesson.exercises && lesson.exercises.length > 0
-  const currentExercise = hasExercises ? lesson.exercises[currentExerciseIndex] : null
+  const hasExercises = exercises.length > 0
+  const currentExercise = hasExercises ? exercises[currentExerciseIndex] : null
 
   const handleTestResults = (results) => {
     setTestResults(results)
@@ -41,7 +45,7 @@ function LessonPage({ lesson, navigateTo, selectedModel }) {
   }
 
   const handleNextExercise = () => {
-    if (currentExerciseIndex < lesson.exercises.length - 1) {
+    if (currentExerciseIndex < exercises.length - 1) {
       setCurrentExerciseIndex((i) => i + 1)
       setTestResults(null)
       setErrorContext(null)
@@ -98,8 +102,8 @@ function LessonPage({ lesson, navigateTo, selectedModel }) {
                 onClick={() => setActiveTab('exercises')}
               >
                 Exercises
-                {lesson.exercises && (
-                  <span className="tab-count">{lesson.exercises.length}</span>
+                {exercises.length > 0 && (
+                  <span className="tab-count">{exercises.length}</span>
                 )}
               </button>
             </div>
@@ -134,15 +138,15 @@ function LessonPage({ lesson, navigateTo, selectedModel }) {
         {(!hasSlides || activeTab === 'exercises') && hasExercises && currentExercise && (
           <div className="lesson-exercises-view animate-fade-in">
             {/* Exercise navigator */}
-            {lesson.exercises.length > 1 && (
+            {exercises.length > 1 && (
               <div className="exercise-navigator">
                 <div className="exercise-nav-left">
                   <span className="text-sm text-secondary">
-                    Exercise {currentExerciseIndex + 1} of {lesson.exercises.length}
+                    Exercise {currentExerciseIndex + 1} of {exercises.length}
                   </span>
                 </div>
                 <div className="exercise-nav-pills">
-                  {lesson.exercises.map((ex, i) => (
+                  {exercises.map((ex, i) => (
                     <button
                       key={ex.id}
                       className={`exercise-nav-pill ${i === currentExerciseIndex ? 'exercise-nav-pill--active' : ''}`}
@@ -170,7 +174,7 @@ function LessonPage({ lesson, navigateTo, selectedModel }) {
                   <button
                     className="btn btn-secondary btn-sm"
                     onClick={handleNextExercise}
-                    disabled={currentExerciseIndex === lesson.exercises.length - 1}
+                    disabled={currentExerciseIndex === exercises.length - 1}
                     aria-label="Next exercise"
                   >
                     →

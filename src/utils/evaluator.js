@@ -72,17 +72,31 @@ function executeUserCode(userCode, setupCode = '') {
 }
 
 /**
- * Run a single test case against the exports object.
+ * Run a single test case.
  *
- * @param {{ description: string, test: (exports: object) => boolean }} testCase
- * @param {object} exports - The object populated by user code.
+ * Supports two test formats:
+ *   - string: JS code string run in the same scope as user code (e.g. `return add(1,2) === 3`)
+ *   - function: (exports: object) => boolean, called with the exports object
+ *
+ * @param {{ description: string, test: string | ((exports: object) => boolean) }} testCase
+ * @param {object} exports - The object populated by user code (for function-style tests).
+ * @param {string} userCode - Original user code (for string-style tests).
+ * @param {string} setupCode - Setup code prepended before user code.
  * @returns {Promise<{ passed: boolean, description: string, error: string|null }>}
  */
-async function runTestCase(testCase, exports) {
+async function runTestCase(testCase, exports, userCode = '', setupCode = '') {
   const { description, test } = testCase
 
   try {
-    const passed = await withTimeout(() => test(exports), TEST_TIMEOUT_MS)
+    let passed
+    if (typeof test === 'string') {
+      // String test: run setup + user code + test string in one Function call
+      const fn = new Function(`${setupCode}\n${userCode}\n${test}`)
+      passed = await withTimeout(() => fn(), TEST_TIMEOUT_MS)
+    } else {
+      // Function test: call with the exports object
+      passed = await withTimeout(() => test(exports), TEST_TIMEOUT_MS)
+    }
 
     return {
       passed: Boolean(passed),
@@ -144,7 +158,9 @@ export async function evaluateCode(userCode, testCases = [], setupCode = '') {
   }
 
   // Step 2: Run each test case
-  const results = await Promise.all(testCases.map((tc) => runTestCase(tc, exports)))
+  const results = await Promise.all(
+    testCases.map((tc) => runTestCase(tc, exports, userCode, setupCode))
+  )
 
   const passed = results.length > 0 && results.every((r) => r.passed)
 
