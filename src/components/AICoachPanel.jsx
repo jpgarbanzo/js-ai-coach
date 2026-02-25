@@ -43,7 +43,7 @@ function AICoachPanel({ selectedModel, exercise, userCode, testResults, errorCon
           activePipe = await loadModel(selectedModel, (progress) => {
             setLoadProgress(progress)
           })
-          setPipe(activePipe)
+          setPipe(() => activePipe)
           setLoadStatus('ready')
         } catch (err) {
           setLoadStatus('error')
@@ -89,7 +89,7 @@ function AICoachPanel({ selectedModel, exercise, userCode, testResults, errorCon
       const loadedPipe = await loadModel(selectedModel, (progress) => {
         setLoadProgress(progress)
       })
-      setPipe(loadedPipe)
+      setPipe(() => loadedPipe)
       setLoadStatus('ready')
     } catch (err) {
       setLoadStatus('error')

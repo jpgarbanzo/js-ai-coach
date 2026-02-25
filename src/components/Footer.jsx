@@ -6,7 +6,7 @@ function Footer() {
     <footer className="app-footer">
       <div className="footer-inner">
         <span className="footer-copy">
-          © {year} JP Garbanzo · All rights reserved
+          © {year} JP
         </span>
         <span className="footer-sep" aria-hidden="true">·</span>
         <a
@@ -17,8 +17,6 @@ function Footer() {
         >
           jpgc.tech
         </a>
-        <span className="footer-sep" aria-hidden="true">·</span>
-        <span className="footer-tagline">Powered by AI Coach</span>
       </div>
       <style>{`
         .app-footer {
@@ -51,9 +49,7 @@ function Footer() {
         .footer-sep {
           opacity: 0.35;
         }
-        .footer-tagline {
-          opacity: 0.4;
-        }
+
       `}</style>
     </footer>
   )
