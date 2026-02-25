@@ -2,6 +2,109 @@ import React, { useState, useEffect } from 'react'
 import { AVAILABLE_MODELS, loadModel, getHint, evaluateSolution, isModelLoaded } from '../utils/aiCoach.js'
 
 /**
+ * Renders AI-generated Markdown text safely as React elements.
+ * Handles: fenced code blocks, inline code, bold, bullet/numbered lists, paragraphs.
+ */
+function MarkdownText({ text }) {
+  if (!text) return null
+
+  // Split on fenced code blocks first so we can handle them separately
+  const segments = text.split(/(```[\s\S]*?```)/g)
+
+  const nodes = []
+  let key = 0
+
+  for (const seg of segments) {
+    // Fenced code block: ```lang\ncode\n```
+    const codeBlock = seg.match(/^```(\w*)\n?([\s\S]*?)```$/)
+    if (codeBlock) {
+      const code = codeBlock[2].trim()
+      nodes.push(
+        <pre key={key++} className="md-code-block"><code>{code}</code></pre>
+      )
+      continue
+    }
+
+    // Split remaining text into lines for paragraph/list handling
+    const lines = seg.split('\n')
+    let paraLines = []
+
+    const flushPara = () => {
+      if (!paraLines.length) return
+      const combined = paraLines.join(' ').trim()
+      if (combined) nodes.push(<p key={key++} className="md-p">{renderInline(combined)}</p>)
+      paraLines = []
+    }
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i]
+
+      // Bullet list item
+      if (/^[-*]\s+/.test(line)) {
+        flushPara()
+        // Collect consecutive bullet lines
+        const items = []
+        while (i < lines.length && /^[-*]\s+/.test(lines[i])) {
+          items.push(lines[i].replace(/^[-*]\s+/, ''))
+          i++
+        }
+        i-- // back up one since for-loop will increment
+        nodes.push(
+          <ul key={key++} className="md-ul">
+            {items.map((it, j) => <li key={j}>{renderInline(it)}</li>)}
+          </ul>
+        )
+        continue
+      }
+
+      // Numbered list item
+      if (/^\d+\.\s+/.test(line)) {
+        flushPara()
+        const items = []
+        while (i < lines.length && /^\d+\.\s+/.test(lines[i])) {
+          items.push(lines[i].replace(/^\d+\.\s+/, ''))
+          i++
+        }
+        i--
+        nodes.push(
+          <ol key={key++} className="md-ol">
+            {items.map((it, j) => <li key={j}>{renderInline(it)}</li>)}
+          </ol>
+        )
+        continue
+      }
+
+      // Blank line flushes the current paragraph
+      if (line.trim() === '') {
+        flushPara()
+      } else {
+        paraLines.push(line)
+      }
+    }
+    flushPara()
+  }
+
+  return <div className="md-body">{nodes}</div>
+}
+
+function renderInline(text) {
+  const parts = []
+  const regex = /(`[^`]+`|\*\*[^*]+\*\*|\*[^*]+\*)/g
+  let last = 0
+  let m
+  while ((m = regex.exec(text)) !== null) {
+    if (m.index > last) parts.push(text.slice(last, m.index))
+    const tok = m[0]
+    if (tok.startsWith('`'))       parts.push(<code key={m.index} className="md-inline-code">{tok.slice(1, -1)}</code>)
+    else if (tok.startsWith('**')) parts.push(<strong key={m.index}>{tok.slice(2, -2)}</strong>)
+    else                           parts.push(<em key={m.index}>{tok.slice(1, -1)}</em>)
+    last = m.index + tok.length
+  }
+  if (last < text.length) parts.push(text.slice(last))
+  return parts.length === 1 && typeof parts[0] === 'string' ? parts[0] : parts
+}
+
+/**
  * AICoachPanel
  *
  * Handles model loading and displays AI-generated hints/feedback.
@@ -251,7 +354,7 @@ function AICoachPanel({ selectedModel, exercise, userCode, testResults, errorCon
             {hint && (
               <div className={`coach-output coach-output--hint animate-fade-in ${hintStatus === 'error' ? 'alert alert-error' : 'alert alert-info'}`}>
                 <strong className="coach-output-label">Hint:</strong>
-                <p className="mt-2 text-sm">{hint}</p>
+                <div className="mt-2 text-sm"><MarkdownText text={hint} /></div>
               </div>
             )}
 
@@ -259,7 +362,7 @@ function AICoachPanel({ selectedModel, exercise, userCode, testResults, errorCon
             {feedback && (
               <div className={`coach-output coach-output--feedback animate-fade-in ${feedbackStatus === 'error' ? 'alert alert-error' : 'alert alert-success'}`}>
                 <strong className="coach-output-label">Feedback:</strong>
-                <p className="mt-2 text-sm">{feedback}</p>
+                <div className="mt-2 text-sm"><MarkdownText text={feedback} /></div>
               </div>
             )}
           </div>
@@ -343,6 +446,50 @@ function AICoachPanel({ selectedModel, exercise, userCode, testResults, errorCon
 
         .coach-output-label {
           font-size: var(--font-size-sm);
+        }
+
+        /* ── Markdown renderer ─────────────────────────────── */
+        .md-body {
+          display: flex;
+          flex-direction: column;
+          gap: var(--space-2);
+        }
+        .md-p {
+          margin: 0;
+          line-height: var(--line-height-relaxed);
+        }
+        .md-ul, .md-ol {
+          margin: 0;
+          padding-left: 1.4em;
+          display: flex;
+          flex-direction: column;
+          gap: var(--space-1);
+        }
+        .md-ul li, .md-ol li {
+          line-height: var(--line-height-relaxed);
+        }
+        .md-code-block {
+          background: #1e1e2e;
+          color: #cdd6f4;
+          font-family: var(--font-family-mono);
+          font-size: 0.8em;
+          padding: var(--space-3) var(--space-4);
+          border-radius: var(--border-radius);
+          overflow-x: auto;
+          white-space: pre;
+          margin: var(--space-1) 0;
+          line-height: 1.6;
+        }
+        .md-inline-code {
+          background: rgba(0,0,0,0.08);
+          font-family: var(--font-family-mono);
+          font-size: 0.85em;
+          padding: 1px 5px;
+          border-radius: 3px;
+        }
+        .coach-output--hint .md-inline-code,
+        .coach-output--feedback .md-inline-code {
+          background: rgba(0,0,0,0.1);
         }
       `}</style>
     </div>
