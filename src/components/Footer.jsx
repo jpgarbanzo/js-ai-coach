@@ -22,7 +22,7 @@ function Footer() {
       </div>
       <style>{`
         .app-footer {
-          background: var(--bg-nav);
+          background: #1e1e2e;
           border-top: 1px solid rgba(255,255,255,0.08);
           padding: var(--space-4) var(--space-6);
           margin-top: auto;
