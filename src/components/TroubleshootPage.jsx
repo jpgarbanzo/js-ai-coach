@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { AVAILABLE_MODELS, checkModelSupport, loadModel, unloadModel, isModelLoaded } from '../utils/aiCoach.js'
+import { AVAILABLE_MODELS, checkModelSupport, loadModel, unloadModel } from '../utils/aiCoach.js'
 import { clearAllProgress, exportAllData } from '../utils/storage.js'
 
 /**

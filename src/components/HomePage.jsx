@@ -1,5 +1,5 @@
 import React from 'react'
-import { LESSONS, getLessonById } from '../lessons/index.js'
+import { LESSONS } from '../lessons/index.js'
 import { getLessonProgress } from '../utils/storage.js'
 
 function LessonCard({ lesson, onStart }) {

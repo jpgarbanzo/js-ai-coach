@@ -62,7 +62,6 @@ function executeUserCode(userCode, setupCode = '') {
 
     // The Function constructor does NOT have access to the surrounding module
     // scope, window, or document — only what we explicitly pass as arguments.
-    // eslint-disable-next-line no-new-func
     const fn = new Function('exports', combined)
     fn(exports)
 
@@ -165,7 +164,6 @@ export async function evaluateCode(userCode, testCases = [], setupCode = '') {
  */
 export function checkSyntax(code) {
   try {
-    // eslint-disable-next-line no-new-func
     new Function(code)
     return null
   } catch (err) {
