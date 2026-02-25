@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import SlideViewer from './SlideViewer.jsx'
 import ExercisePanel from './ExercisePanel.jsx'
 import AICoachPanel from './AICoachPanel.jsx'
+import QuizPanel from './QuizPanel.jsx'
 
 /**
  * LessonPage
@@ -16,9 +17,10 @@ import AICoachPanel from './AICoachPanel.jsx'
 function LessonPage({ lesson, navigateTo, selectedModel }) {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0)
-  const [activeTab, setActiveTab] = useState('slides') // 'slides' | 'exercises'
+  const [activeTab, setActiveTab] = useState('slides') // 'slides' | 'exercises' | 'quiz'
   const [testResults, setTestResults] = useState(null)
   const [errorContext, setErrorContext] = useState(null)
+  const [coachMessage, setCoachMessage] = useState(null)
 
   // Support both a top-level `exercises` array and exercises embedded in slides
   const exercises = lesson.exercises?.length
@@ -26,6 +28,7 @@ function LessonPage({ lesson, navigateTo, selectedModel }) {
     : (lesson.slides ?? []).filter((s) => s.hasExercise).map((s) => s.exercise)
   const hasSlides = lesson.slides && lesson.slides.length > 0
   const hasExercises = exercises.length > 0
+  const hasQuiz = lesson.questions?.length > 0
   const currentExercise = hasExercises ? exercises[currentExerciseIndex] : null
 
   const handleTestResults = (results) => {
@@ -79,33 +82,48 @@ function LessonPage({ lesson, navigateTo, selectedModel }) {
         </div>
       </div>
 
-      {/* Tabs (only if both slides and exercises exist) */}
-      {hasSlides && hasExercises && (
+      {/* Tabs (show when at least two content types exist) */}
+      {(hasSlides || hasExercises || hasQuiz) && (hasSlides + hasExercises + hasQuiz > 1) && (
         <div className="lesson-tabs">
           <div className="container-wide">
             <div className="tabs-row" role="tablist">
-              <button
-                role="tab"
-                aria-selected={activeTab === 'slides'}
-                className={`tab-btn ${activeTab === 'slides' ? 'tab-btn--active' : ''}`}
-                onClick={() => setActiveTab('slides')}
-              >
-                Slides
-                {lesson.slides && (
-                  <span className="tab-count">{lesson.slides.length}</span>
-                )}
-              </button>
-              <button
-                role="tab"
-                aria-selected={activeTab === 'exercises'}
-                className={`tab-btn ${activeTab === 'exercises' ? 'tab-btn--active' : ''}`}
-                onClick={() => setActiveTab('exercises')}
-              >
-                Exercises
-                {exercises.length > 0 && (
-                  <span className="tab-count">{exercises.length}</span>
-                )}
-              </button>
+              {hasSlides && (
+                <button
+                  role="tab"
+                  aria-selected={activeTab === 'slides'}
+                  className={`tab-btn ${activeTab === 'slides' ? 'tab-btn--active' : ''}`}
+                  onClick={() => setActiveTab('slides')}
+                >
+                  Slides
+                  {lesson.slides && (
+                    <span className="tab-count">{lesson.slides.length}</span>
+                  )}
+                </button>
+              )}
+              {hasExercises && (
+                <button
+                  role="tab"
+                  aria-selected={activeTab === 'exercises'}
+                  className={`tab-btn ${activeTab === 'exercises' ? 'tab-btn--active' : ''}`}
+                  onClick={() => setActiveTab('exercises')}
+                >
+                  Exercises
+                  {exercises.length > 0 && (
+                    <span className="tab-count">{exercises.length}</span>
+                  )}
+                </button>
+              )}
+              {hasQuiz && (
+                <button
+                  role="tab"
+                  aria-selected={activeTab === 'quiz'}
+                  className={`tab-btn ${activeTab === 'quiz' ? 'tab-btn--active' : ''}`}
+                  onClick={() => setActiveTab('quiz')}
+                >
+                  Quiz
+                  <span className="tab-count">{lesson.questions.length}</span>
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -114,7 +132,7 @@ function LessonPage({ lesson, navigateTo, selectedModel }) {
       {/* Main content */}
       <div className="lesson-content container-wide">
         {/* Slides tab */}
-        {(!hasExercises || activeTab === 'slides') && hasSlides && (
+        {(!hasExercises && !hasQuiz || activeTab === 'slides') && hasSlides && (
           <div className="lesson-slides-view animate-fade-in">
             <SlideViewer
               slides={lesson.slides}
@@ -135,7 +153,7 @@ function LessonPage({ lesson, navigateTo, selectedModel }) {
         )}
 
         {/* Exercises tab */}
-        {(!hasSlides || activeTab === 'exercises') && hasExercises && currentExercise && (
+        {(!hasSlides && !hasQuiz || activeTab === 'exercises') && hasExercises && currentExercise && (
           <div className="lesson-exercises-view animate-fade-in">
             {/* Exercise navigator */}
             {exercises.length > 1 && (
@@ -210,8 +228,32 @@ function LessonPage({ lesson, navigateTo, selectedModel }) {
           </div>
         )}
 
+        {/* Quiz tab */}
+        {activeTab === 'quiz' && hasQuiz && (
+          <div className="lesson-quiz-view animate-fade-in">
+            <QuizPanel
+              questions={lesson.questions}
+              selectedModel={selectedModel}
+              lessonTitle={lesson.title}
+              onAskCoach={(prompt) => setCoachMessage(prompt)}
+            />
+            {coachMessage && selectedModel !== 'none' && (
+              <div className="quiz-coach-panel mt-6">
+                <AICoachPanel
+                  selectedModel={selectedModel}
+                  exercise={{ title: 'Quiz Question', description: coachMessage, hints: [] }}
+                  userCode={''}
+                  testResults={null}
+                  errorContext={null}
+                  autoPrompt={coachMessage}
+                />
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Empty states */}
-        {!hasSlides && !hasExercises && (
+        {!hasSlides && !hasExercises && !hasQuiz && (
           <div className="card card-body text-center py-12">
             <p className="text-secondary">This lesson has no content yet.</p>
           </div>
@@ -331,6 +373,14 @@ function LessonPage({ lesson, navigateTo, selectedModel }) {
 
         .lesson-slides-view {
           max-width: 800px;
+        }
+
+        .lesson-quiz-view {
+          max-width: 800px;
+        }
+
+        .quiz-coach-panel {
+          margin-top: var(--space-6);
         }
 
         /* Exercise navigator */

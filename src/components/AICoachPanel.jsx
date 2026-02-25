@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { AVAILABLE_MODELS, loadModel, getHint, evaluateSolution, isModelLoaded } from '../utils/aiCoach.js'
 
 /**
@@ -12,8 +12,10 @@ import { AVAILABLE_MODELS, loadModel, getHint, evaluateSolution, isModelLoaded }
  *   userCode       — user's current code string
  *   testResults    — array of test result objects (or null)
  *   errorContext   — error message from last run (or null)
+ *   autoPrompt     — optional string; when provided the coach automatically runs
+ *                    a hint request using this text as the prompt on mount
  */
-function AICoachPanel({ selectedModel, exercise, userCode, testResults, errorContext }) {
+function AICoachPanel({ selectedModel, exercise, userCode, testResults, errorContext, autoPrompt }) {
   const [loadStatus, setLoadStatus] = useState('idle') // idle | loading | ready | error
   const [loadProgress, setLoadProgress] = useState(null)
   const [hintStatus, setHintStatus] = useState('idle') // idle | loading | done | error
@@ -24,6 +26,53 @@ function AICoachPanel({ selectedModel, exercise, userCode, testResults, errorCon
   const [pipe, setPipe] = useState(null)
 
   const modelConfig = AVAILABLE_MODELS.find((m) => m.id === selectedModel)
+
+  // When autoPrompt is provided, automatically load the model (if needed) and
+  // fire a hint request using the prompt text as the exercise description.
+  useEffect(() => {
+    if (!autoPrompt || selectedModel === 'none' || !modelConfig) return
+
+    const run = async () => {
+      let activePipe = pipe
+
+      if (!activePipe && !isModelLoaded(selectedModel)) {
+        setLoadStatus('loading')
+        setLoadError(null)
+        setLoadProgress(null)
+        try {
+          activePipe = await loadModel(selectedModel, (progress) => {
+            setLoadProgress(progress)
+          })
+          setPipe(activePipe)
+          setLoadStatus('ready')
+        } catch (err) {
+          setLoadStatus('error')
+          setLoadError(err instanceof Error ? err.message : String(err))
+          return
+        }
+      }
+
+      if (!activePipe) return
+
+      setHintStatus('loading')
+      setHint(null)
+      try {
+        const syntheticExercise = {
+          ...exercise,
+          description: autoPrompt,
+        }
+        const result = await getHint(activePipe, syntheticExercise, userCode, null)
+        setHint(result)
+        setHintStatus('done')
+      } catch (err) {
+        setHintStatus('error')
+        setHint(`Error getting explanation: ${err instanceof Error ? err.message : String(err)}`)
+      }
+    }
+
+    run()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoPrompt])
 
   if (selectedModel === 'none' || !modelConfig) {
     return null

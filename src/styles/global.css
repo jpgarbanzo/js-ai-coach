@@ -300,6 +300,28 @@ pre code {
   font-size: inherit;
 }
 
+/* ─── Code block (used in slide HTML content) ─────────────────────────── */
+.code-block {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-sm);
+  background: #1e1e2e;
+  color: #cdd6f4;
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--border-radius);
+  margin: var(--space-4) 0;
+  overflow-x: auto;
+  white-space: pre;
+  line-height: 1.7;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: var(--shadow-md);
+  tab-size: 2;
+}
+
+.slide-content .code-block {
+  margin-top: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
 /* ==========================================================================
    Layout Utilities
    ========================================================================== */

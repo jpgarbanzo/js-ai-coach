@@ -485,4 +485,286 @@ async function safeFetch(url) {
       },
     },
   ],
+
+  exercises: [
+    {
+      id: 'ex-10-1',
+      title: 'Create a Delay Promise',
+      difficulty: 'beginner',
+      description: 'Return a Promise that resolves after a given number of milliseconds.',
+      inputSpec: 'ms: number — milliseconds to wait',
+      outputSpec: 'Promise<undefined> — resolves after ms milliseconds',
+      instructions: `
+        <p>Implement a <code>delay</code> function that returns a Promise resolving after <code>ms</code> milliseconds, simulating an async pause.</p>
+        <div class="io-spec">
+          <div class="io-spec-row"><span class="io-label">Function:</span> <code>delay(ms)</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>await delay(500) // waits 500ms then continues</code></div>
+        </div>
+        <p>Use <code>setTimeout</code> inside a <code>new Promise</code>. The Promise should resolve with no value (undefined) after the specified time.</p>
+      `,
+      starterCode: `// Write a function called delay\nfunction delay(ms) {\n  // your code here\n}`,
+      solution: `function delay(ms) {\n  return new Promise(resolve => setTimeout(resolve, ms))\n}`,
+      hints: [
+        'Return new Promise(resolve => ...)',
+        'Inside the Promise, call setTimeout(resolve, ms) to resolve after ms milliseconds',
+        'You do not need to pass a value to resolve — just resolve() or pass it directly',
+      ],
+      testCases: [
+        { description: 'delay returns a Promise', test: 'return delay(10) instanceof Promise', input: '10', expected: 'Promise' },
+        { description: 'delay resolves with undefined', test: 'return delay(10).then(v => v === undefined)', input: '10', expected: 'undefined' },
+        { description: 'delay resolves after the given time', test: 'return new Promise(resolve => { const start = Date.now(); delay(50).then(() => resolve(Date.now() - start >= 40)) })', input: '50', expected: 'resolves after ~50ms' },
+        { description: 'delay(0) resolves immediately', test: 'return delay(0).then(v => v === undefined)', input: '0', expected: 'undefined' },
+      ],
+      concepts: ['Promise', 'setTimeout', 'async', 'resolve'],
+    },
+    {
+      id: 'ex-10-2',
+      title: 'Fetch with Fallback',
+      difficulty: 'beginner',
+      description: 'Try to fetch and parse JSON from a URL; return a fallback value if anything fails.',
+      inputSpec: 'url: string, fallback: any',
+      outputSpec: 'Promise<any> — parsed JSON on success, or fallback value on any error',
+      instructions: `
+        <p>Implement an async function that attempts a fetch request and returns the parsed JSON, or the fallback value if the fetch or parsing fails for any reason.</p>
+        <div class="io-spec">
+          <div class="io-spec-row"><span class="io-label">Function:</span> <code>fetchWithFallback(url, fallback)</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>await fetchWithFallback("/api/data", []) // returns [] if fetch fails</code></div>
+        </div>
+        <p>Use try/catch. In the catch block, return the fallback value instead of re-throwing. A mock fetch is used in tests.</p>
+      `,
+      starterCode: `// Write an async function called fetchWithFallback\nasync function fetchWithFallback(url, fallback) {\n  // your code here\n}`,
+      solution: `async function fetchWithFallback(url, fallback) {\n  try {\n    const response = await fetch(url)\n    return await response.json()\n  } catch (err) {\n    return fallback\n  }\n}`,
+      hints: [
+        'Use try/catch to wrap the fetch call',
+        'In the try block: await fetch(url), then await response.json()',
+        'In the catch block: return fallback (not throw)',
+      ],
+      testCases: [
+        { description: 'returns parsed JSON on success', test: 'globalThis.fetch = () => Promise.resolve({ json: () => Promise.resolve({ok:true}) }); return fetchWithFallback("/url", null).then(v => v.ok === true)', input: 'successful fetch', expected: '{ok:true}' },
+        { description: 'returns fallback when fetch rejects', test: 'globalThis.fetch = () => Promise.reject(new Error("Network error")); return fetchWithFallback("/url", 42).then(v => v === 42)', input: 'fetch rejects', expected: '42' },
+        { description: 'returns fallback when json() rejects', test: 'globalThis.fetch = () => Promise.resolve({ json: () => Promise.reject(new Error("bad json")) }); return fetchWithFallback("/url", "default").then(v => v === "default")', input: 'bad JSON', expected: '"default"' },
+        { description: 'fallback can be any value including arrays', test: 'globalThis.fetch = () => Promise.reject("err"); return fetchWithFallback("/url", []).then(v => Array.isArray(v))', input: 'fallback []', expected: 'array' },
+      ],
+      concepts: ['async/await', 'try/catch', 'fetch', 'error handling', 'fallback pattern'],
+    },
+    {
+      id: 'ex-10-3',
+      title: 'Implement Promise.all from Scratch',
+      difficulty: 'beginner',
+      description: 'Build a Promise.all equivalent without using the built-in Promise.all.',
+      inputSpec: 'promises: Promise<any>[]',
+      outputSpec: 'Promise<any[]> — resolves with array of all results in order, or rejects if any promise rejects',
+      instructions: `
+        <p>Implement <code>promiseAll</code> that behaves like the native <code>Promise.all</code> — it waits for all input promises and resolves with an array of results in the original order.</p>
+        <div class="io-spec">
+          <div class="io-spec-row"><span class="io-label">Function:</span> <code>promiseAll(promises)</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>promiseAll([Promise.resolve(1), Promise.resolve(2)]) → [1, 2]</code></div>
+        </div>
+        <p>If any promise rejects, reject immediately with that error. Preserve the original order of results regardless of resolution order. Do not use <code>Promise.all</code> internally.</p>
+      `,
+      starterCode: `// Write a function called promiseAll (do NOT use Promise.all inside)\nfunction promiseAll(promises) {\n  // your code here\n}`,
+      solution: `function promiseAll(promises) {\n  return new Promise((resolve, reject) => {\n    if (promises.length === 0) return resolve([])\n    const results = new Array(promises.length)\n    let remaining = promises.length\n    promises.forEach((p, i) => {\n      Promise.resolve(p).then(val => {\n        results[i] = val\n        remaining--\n        if (remaining === 0) resolve(results)\n      }).catch(reject)\n    })\n  })\n}`,
+      hints: [
+        'Return a new Promise and maintain an array of results and a counter of remaining promises',
+        'For each promise, attach .then to store the result at the correct index and decrement the counter',
+        'When the counter reaches 0, resolve with the results array; on any rejection, call reject immediately',
+      ],
+      testCases: [
+        { description: 'resolves with all values in order', test: 'return promiseAll([Promise.resolve(1), Promise.resolve(2), Promise.resolve(3)]).then(r => r[0]===1 && r[1]===2 && r[2]===3)', input: '[resolve(1), resolve(2), resolve(3)]', expected: '[1, 2, 3]' },
+        { description: 'rejects when any promise rejects', test: 'return promiseAll([Promise.resolve(1), Promise.reject("oops")]).then(() => false).catch(e => e === "oops")', input: '[resolve(1), reject("oops")]', expected: 'rejects with "oops"' },
+        { description: 'resolves with empty array for empty input', test: 'return promiseAll([]).then(r => Array.isArray(r) && r.length === 0)', input: '[]', expected: '[]' },
+        { description: 'returns a Promise', test: 'return promiseAll([Promise.resolve(1)]) instanceof Promise', input: '[resolve(1)]', expected: 'Promise' },
+      ],
+      concepts: ['Promise', 'new Promise', 'resolve', 'reject', 'forEach', 'counters'],
+    },
+    {
+      id: 'ex-10-4',
+      title: 'Async Retry with Backoff',
+      difficulty: 'medium',
+      description: 'Retry a failing async function up to N times, returning the first success or throwing the last error.',
+      inputSpec: 'fn: () => Promise<any>, retries: number',
+      outputSpec: 'Promise<any> — resolves with fn() result, or rejects after all retries are exhausted',
+      instructions: `
+        <p>Implement an async function that calls <code>fn</code> up to <code>retries</code> times. On each failure it tries again until either it succeeds or runs out of attempts.</p>
+        <div class="io-spec">
+          <div class="io-spec-row"><span class="io-label">Function:</span> <code>asyncRetry(fn, retries)</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>await asyncRetry(unstable, 3) // tries up to 3 times</code></div>
+        </div>
+        <p>Use a loop with try/catch. Return the result as soon as one attempt succeeds. After the last failed attempt, throw the error from that attempt.</p>
+      `,
+      starterCode: `// Write an async function called asyncRetry\nasync function asyncRetry(fn, retries) {\n  // your code here\n}`,
+      solution: `async function asyncRetry(fn, retries) {\n  let lastError\n  for (let i = 0; i < retries; i++) {\n    try {\n      return await fn()\n    } catch (err) {\n      lastError = err\n    }\n  }\n  throw lastError\n}`,
+      hints: [
+        'Use a for loop running retries times',
+        'Inside each iteration, try await fn() — if it succeeds, return the result immediately',
+        'If it throws, store the error and continue the loop; after the loop ends, throw the last stored error',
+      ],
+      testCases: [
+        { description: 'resolves on first attempt when fn succeeds', test: 'return asyncRetry(() => Promise.resolve("ok"), 3).then(v => v === "ok")', input: 'fn succeeds immediately', expected: '"ok"' },
+        { description: 'resolves on second attempt after first fails', test: 'let n = 0; const fn = () => ++n === 1 ? Promise.reject("fail") : Promise.resolve("done"); return asyncRetry(fn, 3).then(v => v === "done")', input: 'fn fails once then succeeds', expected: '"done"' },
+        { description: 'rejects after all retries exhausted', test: 'const fn = () => Promise.reject(new Error("always fails")); return asyncRetry(fn, 2).then(() => false).catch(e => e.message === "always fails")', input: 'fn always fails, retries=2', expected: 'throws "always fails"' },
+        { description: 'fn is called exactly retries times on total failure', test: 'let count = 0; const fn = () => { count++; return Promise.reject("e") }; return asyncRetry(fn, 4).catch(() => count === 4)', input: 'fn fails, retries=4', expected: 'fn called 4 times' },
+      ],
+      concepts: ['async/await', 'try/catch', 'loops', 'error handling', 'retry pattern'],
+    },
+    {
+      id: 'ex-10-5',
+      title: 'Race with Timeout',
+      difficulty: 'medium',
+      description: 'Return a promise that settles with the given promise\'s value, or rejects with "Timeout" if too slow.',
+      inputSpec: 'promise: Promise<any>, ms: number',
+      outputSpec: 'Promise<any> — resolves with the promise value, or rejects with "Timeout" after ms milliseconds',
+      instructions: `
+        <p>Implement a function that races a given promise against a timeout. If the promise resolves before the timeout, return its value. If the timeout fires first, reject with the string <code>"Timeout"</code>.</p>
+        <div class="io-spec">
+          <div class="io-spec-row"><span class="io-label">Function:</span> <code>raceWithTimeout(promise, ms)</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>raceWithTimeout(slowFetch(), 1000) // rejects with "Timeout" if slowFetch takes > 1s</code></div>
+        </div>
+        <p>Create a timeout promise using <code>setTimeout</code> + <code>new Promise</code> that rejects after <code>ms</code> milliseconds. Use <code>Promise.race()</code> to race them.</p>
+      `,
+      starterCode: `// Write a function called raceWithTimeout\nfunction raceWithTimeout(promise, ms) {\n  // your code here\n}`,
+      solution: `function raceWithTimeout(promise, ms) {\n  const timeout = new Promise((_, reject) => setTimeout(() => reject('Timeout'), ms))\n  return Promise.race([promise, timeout])\n}`,
+      hints: [
+        'Create a timeout Promise: new Promise((_, reject) => setTimeout(() => reject("Timeout"), ms))',
+        'Use Promise.race([promise, timeout]) to return whichever settles first',
+        'Promise.race resolves or rejects with the first settled promise\'s value/reason',
+      ],
+      testCases: [
+        { description: 'resolves with promise value when fast enough', test: 'return raceWithTimeout(Promise.resolve(42), 100).then(v => v === 42)', input: 'fast promise, 100ms timeout', expected: '42' },
+        { description: 'rejects with "Timeout" when promise is too slow', test: 'const slow = new Promise(r => setTimeout(r, 200)); return raceWithTimeout(slow, 50).then(() => false).catch(e => e === "Timeout")', input: 'slow promise (200ms), 50ms timeout', expected: '"Timeout"' },
+        { description: 'returns a Promise', test: 'return raceWithTimeout(Promise.resolve(1), 100) instanceof Promise', input: 'any promise', expected: 'Promise' },
+        { description: 'passes through rejection from original promise', test: 'return raceWithTimeout(Promise.reject("err"), 100).catch(e => e === "err")', input: 'rejecting promise', expected: '"err"' },
+      ],
+      concepts: ['Promise.race', 'setTimeout', 'new Promise', 'timeout pattern', 'async'],
+    },
+    {
+      id: 'ex-10-6',
+      title: 'Async Queue',
+      difficulty: 'hard',
+      description: 'Implement a simple async queue class that processes tasks one at a time in the order they were added.',
+      inputSpec: 'AsyncQueue class with add(asyncFn) method',
+      outputSpec: 'class — tasks are run sequentially; add() returns a Promise resolving with the task result',
+      instructions: `
+        <p>Implement a class <code>AsyncQueue</code> that queues async tasks and executes them one at a time in order.</p>
+        <div class="io-spec">
+          <div class="io-spec-row"><span class="io-label">Class:</span> <code>AsyncQueue</code></div>
+          <div class="io-spec-row"><span class="io-label">Method:</span> <code>add(asyncFn) → Promise</code></div>
+        </div>
+        <p>Each call to <code>add(asyncFn)</code> enqueues an async function and returns a Promise that resolves when that task completes. Tasks must run one at a time — a new task only starts after the previous one finishes. The queue starts empty and idle.</p>
+      `,
+      starterCode: `// Write a class called AsyncQueue\nclass AsyncQueue {\n  constructor() {\n    // your code here\n  }\n\n  add(asyncFn) {\n    // your code here\n  }\n}`,
+      solution: `class AsyncQueue {\n  constructor() {\n    this._queue = []\n    this._running = false\n  }\n\n  add(asyncFn) {\n    return new Promise((resolve, reject) => {\n      this._queue.push({ asyncFn, resolve, reject })\n      this._run()\n    })\n  }\n\n  async _run() {\n    if (this._running) return\n    this._running = true\n    while (this._queue.length > 0) {\n      const { asyncFn, resolve, reject } = this._queue.shift()\n      try {\n        resolve(await asyncFn())\n      } catch (err) {\n        reject(err)\n      }\n    }\n    this._running = false\n  }\n}`,
+      hints: [
+        'Keep an internal array (queue) and a boolean flag indicating if the runner is active',
+        'add() pushes { asyncFn, resolve, reject } onto the queue and starts the runner if it is not already running',
+        'The runner loops while the queue is non-empty: shift the next item, await asyncFn(), call resolve/reject, then continue',
+      ],
+      testCases: [
+        { description: 'add() returns a Promise', test: 'const q = new AsyncQueue(); return q.add(() => Promise.resolve(1)) instanceof Promise', input: 'add one task', expected: 'Promise' },
+        { description: 'resolves with the task return value', test: 'const q = new AsyncQueue(); return q.add(() => Promise.resolve(42)).then(v => v === 42)', input: 'task resolves 42', expected: '42' },
+        { description: 'tasks run in order', test: 'const q = new AsyncQueue(); const log = []; const t = v => () => new Promise(r => setTimeout(() => { log.push(v); r(v) }, 10)); return Promise.all([q.add(t(1)), q.add(t(2)), q.add(t(3))]).then(() => log[0]===1 && log[1]===2 && log[2]===3)', input: '3 tasks', expected: 'log: [1,2,3]' },
+        { description: 'rejects when task throws', test: 'const q = new AsyncQueue(); return q.add(() => Promise.reject("oops")).catch(e => e === "oops")', input: 'failing task', expected: '"oops"' },
+      ],
+      concepts: ['classes', 'async/await', 'Promises', 'queues', 'concurrency control'],
+    },
+  ],
+
+  questions: [
+    {
+      id: 'q-10-1',
+      question: 'JavaScript is described as single-threaded. What does this mean in practice?',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: 'Only one variable can be declared at a time', correct: false },
+        { id: 'b', text: 'Only one piece of JavaScript code can execute at a time — there is no true parallelism in user code', correct: true },
+        { id: 'c', text: 'JavaScript can only run in one browser tab at a time', correct: false },
+        { id: 'd', text: 'Functions can only call one other function in their body', correct: false },
+      ],
+      explanation: 'JavaScript has a single call stack, meaning only one function can execute at a time. Long-running synchronous operations block all other code. Async operations (fetch, setTimeout, etc.) are offloaded to Web APIs, allowing the call stack to stay unblocked while waiting.',
+    },
+    {
+      id: 'q-10-2',
+      question: 'What is the role of the Event Loop in JavaScript?',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: 'It runs multiple threads in parallel to handle async work', correct: false },
+        { id: 'b', text: 'It continuously checks if the call stack is empty and, if so, moves the next callback from the task queue to the stack', correct: true },
+        { id: 'c', text: 'It converts callback-based code to Promises automatically', correct: false },
+        { id: 'd', text: 'It manages memory allocation for async functions', correct: false },
+      ],
+      explanation: 'The Event Loop is a loop that runs continuously: if the call stack is empty and there is a callback in the task queue (from setTimeout, DOM events, fetch, etc.), it moves that callback onto the stack to be executed. This is how async code eventually runs.',
+    },
+    {
+      id: 'q-10-3',
+      question: 'What is the order of execution for this code?\nconsole.log("A");\nsetTimeout(() => console.log("B"), 0);\nPromise.resolve().then(() => console.log("C"));\nconsole.log("D");',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: 'A, B, C, D', correct: false },
+        { id: 'b', text: 'A, D, B, C', correct: false },
+        { id: 'c', text: 'A, D, C, B', correct: true },
+        { id: 'd', text: 'A, C, D, B', correct: false },
+      ],
+      explanation: 'Synchronous code runs first: A, then D. Microtasks (Promise .then callbacks) run before macrotasks (setTimeout). So C runs before B. The final order is A, D, C, B. This is because Promise callbacks go into the microtask queue, which is drained before the macrotask queue is checked.',
+    },
+    {
+      id: 'q-10-4',
+      question: 'What are the three states a Promise can be in?',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: 'Loading, Loaded, Error', correct: false },
+        { id: 'b', text: 'Pending, Fulfilled, Rejected', correct: true },
+        { id: 'c', text: 'Waiting, Running, Done', correct: false },
+        { id: 'd', text: 'Open, Resolved, Closed', correct: false },
+      ],
+      explanation: 'A Promise starts in the Pending state. If the async operation succeeds, it transitions to Fulfilled (resolve was called). If it fails, it transitions to Rejected (reject was called). Once settled (fulfilled or rejected), a Promise cannot change state.',
+    },
+    {
+      id: 'q-10-5',
+      question: 'What is the key advantage of async/await over raw .then() chaining?',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: 'async/await is faster at runtime than .then()', correct: false },
+        { id: 'b', text: 'async/await makes asynchronous code read like synchronous code, improving readability and making error handling with try/catch more natural', correct: true },
+        { id: 'c', text: 'async/await can run multiple promises at the same time; .then() cannot', correct: false },
+        { id: 'd', text: 'async/await functions do not return Promises', correct: false },
+      ],
+      explanation: 'async/await is syntactic sugar built on Promises. It does not add new capabilities — it makes async code easier to read and write by eliminating nested .then() chains and allowing try/catch for error handling instead of .catch(). An async function always returns a Promise.',
+    },
+    {
+      id: 'q-10-6',
+      question: 'What is the difference between Promise.all and Promise.race?',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: 'Promise.all runs promises sequentially; Promise.race runs them in parallel', correct: false },
+        { id: 'b', text: 'Promise.all waits for all to resolve (or rejects on first failure); Promise.race settles as soon as any one promise settles', correct: true },
+        { id: 'c', text: 'Promise.all can only handle two promises; Promise.race handles any number', correct: false },
+        { id: 'd', text: 'They are identical — both wait for all promises', correct: false },
+      ],
+      explanation: 'Promise.all takes an array and resolves with an array of all results once every promise fulfills, but rejects immediately if any one rejects. Promise.race settles (resolves or rejects) with the value or reason of whichever promise settles first, ignoring the rest.',
+    },
+    {
+      id: 'q-10-7',
+      question: 'Which statements about error handling in async code are correct? (Select all that apply)',
+      multiSelect: true,
+      options: [
+        { id: 'a', text: 'try/catch works inside async functions to catch rejected awaited promises', correct: true },
+        { id: 'b', text: '.catch() on a promise chain handles rejections from the preceding .then() calls', correct: true },
+        { id: 'c', text: 'fetch() rejects the Promise when it receives a 404 HTTP status', correct: false },
+        { id: 'd', text: 'An uncaught rejected Promise triggers an "unhandledRejection" event', correct: true },
+      ],
+      explanation: 'try/catch inside async functions catches both synchronous errors and awaited Promise rejections. .catch() on a chain handles any prior rejection. However, fetch() only rejects on network failures — HTTP error codes like 404 result in a fulfilled Promise where response.ok is false. Unhandled rejections trigger the unhandledRejection event.',
+    },
+    {
+      id: 'q-10-8',
+      question: 'What is the difference between macrotasks and microtasks in the JavaScript event loop?',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: 'Macrotasks are larger and take longer to execute; microtasks are smaller and faster', correct: false },
+        { id: 'b', text: 'Microtasks (Promise callbacks, queueMicrotask) run after the current task but before the next macrotask (setTimeout, setInterval, I/O)', correct: true },
+        { id: 'c', text: 'They are the same thing — microtask is just a newer name for macrotask', correct: false },
+        { id: 'd', text: 'Macrotasks are synchronous; microtasks are asynchronous', correct: false },
+      ],
+      explanation: 'After each macrotask (a setTimeout callback, an I/O callback, etc.), the engine drains the entire microtask queue (Promise .then handlers, queueMicrotask callbacks, MutationObserver) before picking up the next macrotask. This is why Promise .then always runs before the next setTimeout even if both are already ready.',
+    },
+  ],
 }

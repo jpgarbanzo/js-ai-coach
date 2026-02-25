@@ -3,6 +3,7 @@ import HomePage from './components/HomePage.jsx'
 import LessonPage from './components/LessonPage.jsx'
 import TroubleshootPage from './components/TroubleshootPage.jsx'
 import Navigation from './components/Navigation.jsx'
+import Footer from './components/Footer.jsx'
 import { getStoredModel, saveModel } from './utils/storage.js'
 
 class PageErrorBoundary extends Component {
@@ -55,14 +56,14 @@ function App() {
   }
 
   return (
-    <div className="app">
+    <div className="app" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navigation
         currentView={view}
         navigateTo={navigateTo}
         selectedModel={selectedModel}
         onModelChange={handleModelChange}
       />
-      <main className="main-content">
+      <main className="main-content" style={{ flex: 1 }}>
         <PageErrorBoundary key={view}>
           {view === 'home' && <HomePage navigateTo={navigateTo} />}
           {view === 'lesson' && currentLesson && (
@@ -77,6 +78,7 @@ function App() {
           )}
         </PageErrorBoundary>
       </main>
+      <Footer />
     </div>
   )
 }

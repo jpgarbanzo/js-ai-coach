@@ -430,4 +430,288 @@ function makeMultiplier(factor) {
       },
     },
   ],
+
+  exercises: [
+    {
+      id: 'ex-07-1',
+      title: 'Multiply Two Numbers',
+      difficulty: 'beginner',
+      description: 'Write a function that returns the product of two numbers.',
+      inputSpec: 'a: number, b: number',
+      outputSpec: 'number — the product a * b',
+      instructions: `
+        <p>Implement a simple function that multiplies two numbers together.</p>
+        <div class="io-spec">
+          <div class="io-spec-row"><span class="io-label">Function:</span> <code>multiply(a, b)</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>multiply(3, 4) → 12</code></div>
+        </div>
+        <p>The function should work with negative numbers and zero as well.</p>
+      `,
+      starterCode: `// Write a function called multiply\nfunction multiply(a, b) {\n  // your code here\n}`,
+      solution: `function multiply(a, b) {\n  return a * b\n}`,
+      hints: [
+        'Use the * operator to multiply two values',
+        'Return the result directly: return a * b',
+        'This is a one-liner — no loops or conditions needed',
+      ],
+      testCases: [
+        { description: 'multiply(3, 4) returns 12', test: 'return multiply(3, 4) === 12', input: '3, 4', expected: '12' },
+        { description: 'multiply(0, 99) returns 0', test: 'return multiply(0, 99) === 0', input: '0, 99', expected: '0' },
+        { description: 'multiply(-2, 5) returns -10', test: 'return multiply(-2, 5) === -10', input: '-2, 5', expected: '-10' },
+        { description: 'multiply(7, 7) returns 49', test: 'return multiply(7, 7) === 49', input: '7, 7', expected: '49' },
+      ],
+      concepts: ['functions', 'arithmetic', 'return'],
+    },
+    {
+      id: 'ex-07-2',
+      title: 'Greet All with Rest Params',
+      difficulty: 'beginner',
+      description: 'Use rest parameters to greet any number of names in one call.',
+      inputSpec: '...names: string[] — one or more name strings',
+      outputSpec: 'string — "Hello, Name1, Name2, ...!"',
+      instructions: `
+        <p>Implement a function that takes any number of names using rest parameters and returns a greeting string.</p>
+        <div class="io-spec">
+          <div class="io-spec-row"><span class="io-label">Function:</span> <code>greetAll(...names)</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>greetAll("Alice", "Bob") → "Hello, Alice, Bob!"</code></div>
+        </div>
+        <p>The names should be joined with a comma and a space. The string must start with "Hello, " and end with "!".</p>
+      `,
+      starterCode: `// Write a function called greetAll\nfunction greetAll(...names) {\n  // your code here\n}`,
+      solution: `function greetAll(...names) {\n  return \`Hello, \${names.join(', ')}!\`\n}`,
+      hints: [
+        'Use rest parameters (...names) to collect all arguments into an array',
+        'Use names.join(", ") to combine the names with a comma-space separator',
+        'Wrap the result in a template literal: `Hello, ${names.join(", ")}!`',
+      ],
+      testCases: [
+        { description: 'greetAll("Alice") returns "Hello, Alice!"', test: 'return greetAll("Alice") === "Hello, Alice!"', input: '"Alice"', expected: '"Hello, Alice!"' },
+        { description: 'greetAll("Alice", "Bob") returns "Hello, Alice, Bob!"', test: 'return greetAll("Alice", "Bob") === "Hello, Alice, Bob!"', input: '"Alice", "Bob"', expected: '"Hello, Alice, Bob!"' },
+        { description: 'greetAll("Alice", "Bob", "Charlie") returns correct string', test: 'return greetAll("Alice", "Bob", "Charlie") === "Hello, Alice, Bob, Charlie!"', input: '"Alice", "Bob", "Charlie"', expected: '"Hello, Alice, Bob, Charlie!"' },
+        { description: 'greetAll("X") contains "Hello," prefix', test: 'return greetAll("X").startsWith("Hello,")', input: '"X"', expected: 'starts with "Hello,"' },
+      ],
+      concepts: ['rest parameters', 'template literals', 'array join'],
+    },
+    {
+      id: 'ex-07-3',
+      title: 'Apply Twice',
+      difficulty: 'beginner',
+      description: 'Write a higher-order function that applies a function to a value twice.',
+      inputSpec: 'fn: function, x: any',
+      outputSpec: 'any — result of fn(fn(x))',
+      instructions: `
+        <p>Implement a function that calls <code>fn</code> on <code>x</code>, then calls <code>fn</code> again on the result.</p>
+        <div class="io-spec">
+          <div class="io-spec-row"><span class="io-label">Function:</span> <code>applyTwice(fn, x)</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>applyTwice(x => x + 3, 7) → 13</code></div>
+        </div>
+        <p>This pattern is the basis of function composition. The function <code>fn</code> can be any single-argument function.</p>
+      `,
+      starterCode: `// Write a function called applyTwice\nfunction applyTwice(fn, x) {\n  // your code here\n}`,
+      solution: `function applyTwice(fn, x) {\n  return fn(fn(x))\n}`,
+      hints: [
+        'First call fn(x) to get an intermediate result',
+        'Then call fn again on that intermediate result',
+        'You can do it in one line: return fn(fn(x))',
+      ],
+      testCases: [
+        { description: 'applyTwice(x => x + 3, 7) returns 13', test: 'return applyTwice(x => x + 3, 7) === 13', input: 'x => x + 3, 7', expected: '13' },
+        { description: 'applyTwice(x => x * 2, 3) returns 12', test: 'return applyTwice(x => x * 2, 3) === 12', input: 'x => x * 2, 3', expected: '12' },
+        { description: 'applyTwice(x => x - 1, 10) returns 8', test: 'return applyTwice(x => x - 1, 10) === 8', input: 'x => x - 1, 10', expected: '8' },
+        { description: 'applyTwice works with string functions', test: 'return applyTwice(s => s + "!", "hi") === "hi!!"', input: 's => s + "!", "hi"', expected: '"hi!!"' },
+      ],
+      concepts: ['higher-order functions', 'function arguments', 'function application'],
+    },
+    {
+      id: 'ex-07-4',
+      title: 'Memoize a Function',
+      difficulty: 'medium',
+      description: 'Return a memoized version of a function that caches results by first argument.',
+      inputSpec: 'fn: function',
+      outputSpec: 'function — memoized version of fn',
+      instructions: `
+        <p>Implement a <code>memoize</code> function that takes a function <code>fn</code> and returns a new function. The new function should cache the result of each call keyed by the first argument, so repeated calls with the same argument skip recomputation.</p>
+        <div class="io-spec">
+          <div class="io-spec-row"><span class="io-label">Function:</span> <code>memoize(fn)</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>const mDouble = memoize(x => x * 2); mDouble(5) → 10</code></div>
+        </div>
+        <p>Use a plain object or <code>Map</code> as the cache. The memoized function should return the cached value on repeated calls rather than calling <code>fn</code> again.</p>
+      `,
+      starterCode: `// Write a function called memoize\nfunction memoize(fn) {\n  // your code here\n}`,
+      solution: `function memoize(fn) {\n  const cache = new Map()\n  return function(arg) {\n    if (cache.has(arg)) return cache.get(arg)\n    const result = fn(arg)\n    cache.set(arg, result)\n    return result\n  }\n}`,
+      hints: [
+        'Create a cache (Map or plain object) inside memoize using a closure',
+        'Return a new function that first checks if the argument is in the cache',
+        'If the cache has a hit, return it; otherwise call fn(arg), store the result, and return it',
+      ],
+      testCases: [
+        { description: 'memoize returns a function', test: 'return typeof memoize(x => x) === "function"', input: 'x => x', expected: 'function' },
+        { description: 'memoized function returns correct value', test: 'const f = memoize(x => x * 3); return f(4) === 12', input: 'x => x * 3, called with 4', expected: '12' },
+        { description: 'memoized function caches results (call count check)', test: 'let count = 0; const f = memoize(x => { count++; return x * 2; }); f(5); f(5); return count === 1', input: 'call f(5) twice', expected: 'fn called only once' },
+        { description: 'different args produce different results', test: 'const f = memoize(x => x + 10); return f(1) === 11 && f(2) === 12', input: 'f(1), f(2)', expected: '11, 12' },
+      ],
+      concepts: ['closures', 'memoization', 'Map', 'higher-order functions', 'caching'],
+    },
+    {
+      id: 'ex-07-5',
+      title: 'Function Composition',
+      difficulty: 'medium',
+      description: 'Implement right-to-left function composition for any number of functions.',
+      inputSpec: '...fns: function[] — functions to compose',
+      outputSpec: 'function — composed function where compose(f, g)(x) equals f(g(x))',
+      instructions: `
+        <p>Implement <code>compose</code>, which takes any number of functions and returns a new function. The returned function applies the functions from right to left.</p>
+        <div class="io-spec">
+          <div class="io-spec-row"><span class="io-label">Function:</span> <code>compose(...fns)</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>compose(x => x + 1, x => x * 2)(3) → 7</code></div>
+        </div>
+        <p>With the example above: first <code>x * 2</code> gives 6, then <code>x + 1</code> gives 7. This is standard mathematical function composition.</p>
+      `,
+      starterCode: `// Write a function called compose\nfunction compose(...fns) {\n  // your code here\n}`,
+      solution: `function compose(...fns) {\n  return function(x) {\n    return fns.reduceRight((acc, fn) => fn(acc), x)\n  }\n}`,
+      hints: [
+        'Use rest parameters (...fns) to collect all functions',
+        'Return a new function that takes an initial value x',
+        'Use reduceRight to apply functions from right to left: fns.reduceRight((acc, fn) => fn(acc), x)',
+      ],
+      testCases: [
+        { description: 'compose(f, g)(x) applies g then f', test: 'const fn = compose(x => x + 1, x => x * 2); return fn(3) === 7', input: 'compose(x=>x+1, x=>x*2)(3)', expected: '7' },
+        { description: 'compose with single function works', test: 'const fn = compose(x => x * 10); return fn(5) === 50', input: 'compose(x=>x*10)(5)', expected: '50' },
+        { description: 'compose applies three functions right-to-left', test: 'const fn = compose(x => x - 1, x => x * 3, x => x + 2); return fn(4) === 17', input: 'compose(x=>x-1, x=>x*3, x=>x+2)(4)', expected: '17' },
+        { description: 'compose returns a function', test: 'return typeof compose(x => x) === "function"', input: 'compose(x => x)', expected: 'function' },
+      ],
+      concepts: ['function composition', 'reduceRight', 'higher-order functions', 'rest parameters'],
+    },
+    {
+      id: 'ex-07-6',
+      title: 'Curry Any Function',
+      difficulty: 'hard',
+      description: 'Implement currying for a function of any arity.',
+      inputSpec: 'fn: function — a function with a fixed number of parameters (fn.length)',
+      outputSpec: 'function — curried version of fn',
+      instructions: `
+        <p>Implement a <code>curry</code> function that transforms a multi-argument function into a series of single-argument functions.</p>
+        <div class="io-spec">
+          <div class="io-spec-row"><span class="io-label">Function:</span> <code>curry(fn)</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>curry((a,b,c) => a+b+c)(1)(2)(3) → 6</code></div>
+        </div>
+        <p>Use <code>fn.length</code> to know how many arguments are needed. When enough arguments have been collected, call the original function. Otherwise return another curried function waiting for more arguments.</p>
+        <p>You may also allow partial application: <code>curriedFn(1, 2)(3)</code> should also work.</p>
+      `,
+      starterCode: `// Write a function called curry\nfunction curry(fn) {\n  // your code here\n}`,
+      solution: `function curry(fn) {\n  return function curried(...args) {\n    if (args.length >= fn.length) {\n      return fn(...args)\n    }\n    return function(...moreArgs) {\n      return curried(...args, ...moreArgs)\n    }\n  }\n}`,
+      hints: [
+        'Check args.length against fn.length to know if enough arguments have been supplied',
+        'If enough args: call fn(...args) and return the result',
+        'If not enough: return a new function that concatenates the current args with new ones and calls curried again',
+      ],
+      testCases: [
+        { description: 'curry works with one-at-a-time application', test: 'const add3 = curry((a, b, c) => a + b + c); return add3(1)(2)(3) === 6', input: 'curry((a,b,c)=>a+b+c)(1)(2)(3)', expected: '6' },
+        { description: 'curry works with partial application', test: 'const add3 = curry((a, b, c) => a + b + c); return add3(1, 2)(3) === 6', input: 'add3(1,2)(3)', expected: '6' },
+        { description: 'curry works with all args at once', test: 'const add3 = curry((a, b, c) => a + b + c); return add3(1, 2, 3) === 6', input: 'add3(1,2,3)', expected: '6' },
+        { description: 'curry returns a function when partially applied', test: 'const add3 = curry((a, b, c) => a + b + c); return typeof add3(1) === "function"', input: 'add3(1)', expected: 'function' },
+        { description: 'curry works with two-argument functions', test: 'const mul = curry((a, b) => a * b); return mul(4)(5) === 20', input: 'curry((a,b)=>a*b)(4)(5)', expected: '20' },
+      ],
+      concepts: ['currying', 'closures', 'recursion', 'rest/spread', 'higher-order functions'],
+    },
+  ],
+
+  questions: [
+    {
+      id: 'q-07-1',
+      question: 'Which of the following function types are hoisted to the top of their scope so they can be called before their definition in the code?',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: 'Arrow functions assigned to const', correct: false },
+        { id: 'b', text: 'Function declarations (function foo() {})', correct: true },
+        { id: 'c', text: 'Function expressions assigned to var', correct: false },
+        { id: 'd', text: 'Anonymous functions passed as callbacks', correct: false },
+      ],
+      explanation: 'Function declarations are fully hoisted — both their name and body. Function expressions and arrow functions are not hoisted in a callable way (the variable may be hoisted but its value is undefined until the assignment line runs).',
+    },
+    {
+      id: 'q-07-2',
+      question: 'What is the key difference between arrow functions and regular functions regarding the "this" keyword?',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: 'Arrow functions always bind "this" to the global object', correct: false },
+        { id: 'b', text: 'Arrow functions do not have their own "this"; they inherit it from the enclosing scope', correct: true },
+        { id: 'c', text: 'Regular functions cannot use "this" at all', correct: false },
+        { id: 'd', text: 'Arrow functions bind "this" to the first argument', correct: false },
+      ],
+      explanation: 'Arrow functions use lexical "this" — they close over the "this" value from wherever they were defined, rather than getting a new "this" each time they are called. This makes them ideal for callbacks inside class methods.',
+    },
+    {
+      id: 'q-07-3',
+      question: 'Given: function greet(name, greeting = "Hello") { return greeting + ", " + name; } — what does greet("Alice") return?',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: '"undefined, Alice"', correct: false },
+        { id: 'b', text: '"Hello, Alice"', correct: true },
+        { id: 'c', text: 'An error because greeting is missing', correct: false },
+        { id: 'd', text: '"Alice, Hello"', correct: false },
+      ],
+      explanation: 'Default parameters are used when the argument is omitted or passed as undefined. Here, greeting defaults to "Hello", so greet("Alice") returns "Hello, Alice".',
+    },
+    {
+      id: 'q-07-4',
+      question: 'What is the difference between rest parameters (...args) and the spread operator (...)?',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: 'They are identical — both collect values into arrays', correct: false },
+        { id: 'b', text: 'Rest collects arguments into an array in a function definition; spread expands an iterable into individual values at a call site', correct: true },
+        { id: 'c', text: 'Spread only works on strings; rest works on arrays', correct: false },
+        { id: 'd', text: 'Rest parameters appear at the call site; spread appears in the function definition', correct: false },
+      ],
+      explanation: 'The same ... syntax serves two different purposes depending on context. In a function parameter list (...args), it collects remaining arguments into an array (rest). At a call site or in an array literal ([...arr]), it expands an iterable into individual elements (spread).',
+    },
+    {
+      id: 'q-07-5',
+      question: 'A closure is best described as:',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: 'A function that takes another function as an argument', correct: false },
+        { id: 'b', text: 'A function that has access to variables from its outer (enclosing) scope even after that outer scope has returned', correct: true },
+        { id: 'c', text: 'A function with no parameters', correct: false },
+        { id: 'd', text: 'An immediately invoked function expression', correct: false },
+      ],
+      explanation: 'Closures allow inner functions to "remember" and access variables from the outer function\'s scope, even after the outer function has finished executing. This is how private state can be created in JavaScript.',
+    },
+    {
+      id: 'q-07-6',
+      question: 'What is an IIFE (Immediately Invoked Function Expression) and why is it used?',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: 'A function that runs only once via a timer', correct: false },
+        { id: 'b', text: 'A function that is defined and called immediately, creating a private scope to avoid polluting the global namespace', correct: true },
+        { id: 'c', text: 'A function that calls itself recursively', correct: false },
+        { id: 'd', text: 'A function declared inside a class constructor', correct: false },
+      ],
+      explanation: 'An IIFE uses the pattern (function() { ... })() or (() => { ... })(). It executes immediately after being defined. Its primary use is to create an isolated scope so variables inside do not leak into the global scope.',
+    },
+    {
+      id: 'q-07-7',
+      question: 'Which of the following are characteristics of a pure function? (Select all that apply)',
+      multiSelect: true,
+      options: [
+        { id: 'a', text: 'Given the same inputs, it always returns the same output', correct: true },
+        { id: 'b', text: 'It has no side effects (does not modify external state)', correct: true },
+        { id: 'c', text: 'It must use arrow function syntax', correct: false },
+        { id: 'd', text: 'It does not rely on or modify variables outside its own scope', correct: true },
+      ],
+      explanation: 'Pure functions are deterministic (same input always yields same output) and free of side effects (no mutation of external state, no I/O). The syntax used (arrow vs. declaration) is irrelevant to purity.',
+    },
+    {
+      id: 'q-07-8',
+      question: 'A higher-order function is one that:',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: 'Has more than three parameters', correct: false },
+        { id: 'b', text: 'Takes another function as an argument and/or returns a function as its result', correct: true },
+        { id: 'c', text: 'Is declared at the top level of a module', correct: false },
+        { id: 'd', text: 'Uses recursion internally', correct: false },
+      ],
+      explanation: 'Higher-order functions operate on other functions — either by accepting them as arguments (like Array.map, Array.filter) or by returning them (like factory functions and memoize). This is a core concept of functional programming in JavaScript.',
+    },
+  ],
 }

@@ -342,4 +342,300 @@ true || false && false  // true (same as: true || (false && false))</div>
       hasExercise: false,
     },
   ],
+
+  exercises: [
+    {
+      id: 'ex-03-1',
+      title: 'Calculator Function',
+      difficulty: 'beginner',
+      description: 'Write a function that performs basic arithmetic given two numbers and an operator string.',
+      inputSpec: 'a: number, b: number, operator: string ("+", "-", "*", "/")',
+      outputSpec: 'number — the result, or null for division by zero or unknown operator',
+      instructions: `
+        <p>Write a function called <code>calculate</code> that takes two numbers and an operator string, then returns the result.</p>
+        <div class="io-spec">
+          <div class="io-spec-row"><span class="io-label">Function:</span> <code>calculate(a, b, operator)</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>calculate(10, 3, "+") → 13</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>calculate(10, 0, "/") → null</code></div>
+        </div>
+        <p>Supported operators: <code>"+"</code>, <code>"-"</code>, <code>"*"</code>, <code>"/"</code>. Return <code>null</code> if dividing by zero or if the operator is unknown.</p>
+      `,
+      starterCode: `// Write a function called calculate\nfunction calculate(a, b, operator) {\n  // your code here\n}`,
+      solution: `function calculate(a, b, operator) {\n  if (operator === '+') return a + b\n  if (operator === '-') return a - b\n  if (operator === '*') return a * b\n  if (operator === '/') {\n    if (b === 0) return null\n    return a / b\n  }\n  return null\n}`,
+      hints: [
+        'Use if statements to check which operator was passed',
+        'Guard against division by zero: check b === 0 before dividing',
+        'Return null as the default for any unrecognized operator',
+      ],
+      testCases: [
+        { description: 'calculate(10, 5, "+") returns 15', test: 'return calculate(10, 5, "+") === 15', input: '10, 5, "+"', expected: '15' },
+        { description: 'calculate(10, 3, "-") returns 7', test: 'return calculate(10, 3, "-") === 7', input: '10, 3, "-"', expected: '7' },
+        { description: 'calculate(4, 5, "*") returns 20', test: 'return calculate(4, 5, "*") === 20', input: '4, 5, "*"', expected: '20' },
+        { description: 'calculate(10, 4, "/") returns 2.5', test: 'return calculate(10, 4, "/") === 2.5', input: '10, 4, "/"', expected: '2.5' },
+        { description: 'calculate(10, 0, "/") returns null', test: 'return calculate(10, 0, "/") === null', input: '10, 0, "/"', expected: 'null' },
+      ],
+      concepts: ['arithmetic operators', 'conditionals', 'return', 'division by zero'],
+    },
+    {
+      id: 'ex-03-2',
+      title: 'Even or Odd',
+      difficulty: 'beginner',
+      description: 'Write a function that returns "even" or "odd" for a given integer using the modulo operator.',
+      inputSpec: 'n: number (integer)',
+      outputSpec: 'string — "even" or "odd"',
+      instructions: `
+        <p>Write a function called <code>isEvenOrOdd</code> that takes an integer and returns <code>"even"</code> if it is even or <code>"odd"</code> if it is odd.</p>
+        <div class="io-spec">
+          <div class="io-spec-row"><span class="io-label">Function:</span> <code>isEvenOrOdd(n)</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>isEvenOrOdd(4) → "even"</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>isEvenOrOdd(7) → "odd"</code></div>
+        </div>
+        <p>Use the modulo operator <code>%</code> to get the remainder when dividing by 2. A remainder of 0 means the number is even.</p>
+      `,
+      starterCode: `// Write a function called isEvenOrOdd\nfunction isEvenOrOdd(n) {\n  // your code here\n}`,
+      solution: `function isEvenOrOdd(n) {\n  return n % 2 === 0 ? 'even' : 'odd'\n}`,
+      hints: [
+        'Use the modulo operator: n % 2 gives the remainder when dividing by 2',
+        'If the remainder is 0, the number is even',
+        'Use a ternary operator: n % 2 === 0 ? "even" : "odd"',
+      ],
+      testCases: [
+        { description: 'isEvenOrOdd(4) returns "even"', test: 'return isEvenOrOdd(4) === "even"', input: '4', expected: '"even"' },
+        { description: 'isEvenOrOdd(7) returns "odd"', test: 'return isEvenOrOdd(7) === "odd"', input: '7', expected: '"odd"' },
+        { description: 'isEvenOrOdd(0) returns "even"', test: 'return isEvenOrOdd(0) === "even"', input: '0', expected: '"even"' },
+        { description: 'isEvenOrOdd(-3) returns "odd"', test: 'return isEvenOrOdd(-3) === "odd"', input: '-3', expected: '"odd"' },
+        { description: 'isEvenOrOdd(-2) returns "even"', test: 'return isEvenOrOdd(-2) === "even"', input: '-2', expected: '"even"' },
+      ],
+      concepts: ['modulo', 'ternary operator', 'arithmetic operators'],
+    },
+    {
+      id: 'ex-03-3',
+      title: 'Ternary Grader',
+      difficulty: 'beginner',
+      description: 'Write a function that returns "pass" or "fail" based on a score using the ternary operator.',
+      inputSpec: 'score: number',
+      outputSpec: 'string — "pass" if score >= 60, "fail" otherwise',
+      instructions: `
+        <p>Write a function called <code>passOrFail</code> that takes a score (0–100) and returns <code>"pass"</code> if the score is 60 or above, or <code>"fail"</code> otherwise.</p>
+        <div class="io-spec">
+          <div class="io-spec-row"><span class="io-label">Function:</span> <code>passOrFail(score)</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>passOrFail(75) → "pass"</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>passOrFail(45) → "fail"</code></div>
+        </div>
+        <p>Use the ternary operator <code>condition ? valueIfTrue : valueIfFalse</code> for a single-line solution.</p>
+      `,
+      starterCode: `// Write a function called passOrFail\nfunction passOrFail(score) {\n  // your code here\n}`,
+      solution: `function passOrFail(score) {\n  return score >= 60 ? 'pass' : 'fail'\n}`,
+      hints: [
+        'Use a ternary operator: condition ? "pass" : "fail"',
+        'The condition is score >= 60',
+        'Return the ternary expression directly',
+      ],
+      testCases: [
+        { description: 'passOrFail(75) returns "pass"', test: 'return passOrFail(75) === "pass"', input: '75', expected: '"pass"' },
+        { description: 'passOrFail(60) returns "pass" (boundary)', test: 'return passOrFail(60) === "pass"', input: '60', expected: '"pass"' },
+        { description: 'passOrFail(59) returns "fail" (boundary)', test: 'return passOrFail(59) === "fail"', input: '59', expected: '"fail"' },
+        { description: 'passOrFail(0) returns "fail"', test: 'return passOrFail(0) === "fail"', input: '0', expected: '"fail"' },
+        { description: 'passOrFail(100) returns "pass"', test: 'return passOrFail(100) === "pass"', input: '100', expected: '"pass"' },
+      ],
+      concepts: ['ternary operator', 'comparison operators', 'return'],
+    },
+    {
+      id: 'ex-03-4',
+      title: 'Strict vs Loose Equality',
+      difficulty: 'medium',
+      description: 'Write a function that returns an object comparing == and === for a pair of values.',
+      inputSpec: 'a: any, b: any',
+      outputSpec: 'object — { loose: boolean, strict: boolean }',
+      instructions: `
+        <p>Write a function called <code>compareEquality</code> that takes two values <code>a</code> and <code>b</code> and returns an object with the results of both equality checks.</p>
+        <div class="io-spec">
+          <div class="io-spec-row"><span class="io-label">Function:</span> <code>compareEquality(a, b)</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>compareEquality(5, "5") → { loose: true, strict: false }</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>compareEquality(5, 5) → { loose: true, strict: true }</code></div>
+        </div>
+        <p>The returned object must have: <code>loose</code> (result of <code>a == b</code>) and <code>strict</code> (result of <code>a === b</code>).</p>
+      `,
+      starterCode: `// Write a function called compareEquality\nfunction compareEquality(a, b) {\n  // your code here\n}`,
+      solution: `function compareEquality(a, b) {\n  return {\n    loose: a == b,\n    strict: a === b,\n  }\n}`,
+      hints: [
+        'Return an object literal with two properties',
+        'The loose property is: a == b (double equals, allows type coercion)',
+        'The strict property is: a === b (triple equals, no type coercion)',
+      ],
+      testCases: [
+        { description: 'compareEquality(5, "5") — loose true, strict false', test: 'const r = compareEquality(5, "5"); return r.loose === true && r.strict === false', input: '5, "5"', expected: '{ loose: true, strict: false }' },
+        { description: 'compareEquality(5, 5) — both true', test: 'const r = compareEquality(5, 5); return r.loose === true && r.strict === true', input: '5, 5', expected: '{ loose: true, strict: true }' },
+        { description: 'compareEquality(0, false) — loose true, strict false', test: 'const r = compareEquality(0, false); return r.loose === true && r.strict === false', input: '0, false', expected: '{ loose: true, strict: false }' },
+        { description: 'compareEquality(null, undefined) — loose true, strict false', test: 'const r = compareEquality(null, undefined); return r.loose === true && r.strict === false', input: 'null, undefined', expected: '{ loose: true, strict: false }' },
+        { description: 'compareEquality(1, 2) — both false', test: 'const r = compareEquality(1, 2); return r.loose === false && r.strict === false', input: '1, 2', expected: '{ loose: false, strict: false }' },
+      ],
+      concepts: ['strict equality', 'loose equality', 'type coercion', 'objects'],
+    },
+    {
+      id: 'ex-03-5',
+      title: 'Logical Evaluator',
+      difficulty: 'medium',
+      description: 'Write a function that evaluates logical operations (AND, OR, NOT) on two boolean values.',
+      inputSpec: 'a: boolean, b: boolean, operator: string ("AND", "OR", "NOT")',
+      outputSpec: 'boolean — the result of the logical operation',
+      instructions: `
+        <p>Write a function called <code>logicalEval</code> that takes two booleans <code>a</code> and <code>b</code>, and an operator string, and returns the boolean result.</p>
+        <div class="io-spec">
+          <div class="io-spec-row"><span class="io-label">Function:</span> <code>logicalEval(a, b, operator)</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>logicalEval(true, false, "AND") → false</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>logicalEval(true, false, "OR") → true</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>logicalEval(true, false, "NOT") → false</code> (NOT applies to <code>a</code>)</div>
+        </div>
+        <p>For <code>"NOT"</code>, apply the NOT operator to <code>a</code> only (ignore <code>b</code>). Return <code>null</code> for unknown operators.</p>
+      `,
+      starterCode: `// Write a function called logicalEval\nfunction logicalEval(a, b, operator) {\n  // your code here\n}`,
+      solution: `function logicalEval(a, b, operator) {\n  if (operator === 'AND') return a && b\n  if (operator === 'OR') return a || b\n  if (operator === 'NOT') return !a\n  return null\n}`,
+      hints: [
+        'Use if statements to branch on the operator string',
+        'For "AND" return a && b, for "OR" return a || b',
+        'For "NOT" return !a (the NOT operator only needs one operand)',
+      ],
+      testCases: [
+        { description: 'logicalEval(true, false, "AND") returns false', test: 'return logicalEval(true, false, "AND") === false', input: 'true, false, "AND"', expected: 'false' },
+        { description: 'logicalEval(true, true, "AND") returns true', test: 'return logicalEval(true, true, "AND") === true', input: 'true, true, "AND"', expected: 'true' },
+        { description: 'logicalEval(true, false, "OR") returns true', test: 'return logicalEval(true, false, "OR") === true', input: 'true, false, "OR"', expected: 'true' },
+        { description: 'logicalEval(false, false, "OR") returns false', test: 'return logicalEval(false, false, "OR") === false', input: 'false, false, "OR"', expected: 'false' },
+        { description: 'logicalEval(true, false, "NOT") returns false', test: 'return logicalEval(true, false, "NOT") === false', input: 'true, false, "NOT"', expected: 'false' },
+        { description: 'logicalEval(false, true, "NOT") returns true', test: 'return logicalEval(false, true, "NOT") === true', input: 'false, true, "NOT"', expected: 'true' },
+      ],
+      concepts: ['logical operators', 'AND', 'OR', 'NOT', 'conditionals'],
+    },
+    {
+      id: 'ex-03-6',
+      title: 'Expression Evaluator',
+      difficulty: 'hard',
+      description: 'Write a function that evaluates simple arithmetic expressions respecting operator precedence.',
+      inputSpec: 'expr: string — e.g. "2 + 3 * 4"',
+      outputSpec: 'number — the correctly evaluated result',
+      instructions: `
+        <p>Write a function called <code>evalExpr</code> that takes a string containing a simple arithmetic expression with integers and the operators <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, and evaluates it respecting standard operator precedence (multiplication and division before addition and subtraction).</p>
+        <div class="io-spec">
+          <div class="io-spec-row"><span class="io-label">Function:</span> <code>evalExpr(expr)</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>evalExpr("2 + 3 * 4") → 14</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>evalExpr("10 - 2 * 3") → 4</code></div>
+        </div>
+        <p>Strategy: first split by spaces to get tokens, then process <code>*</code> and <code>/</code> first (reducing the token array), then process <code>+</code> and <code>-</code>. Tokens are space-separated (e.g. "2 + 3 * 4").</p>
+      `,
+      starterCode: `// Write a function called evalExpr\nfunction evalExpr(expr) {\n  // your code here\n}`,
+      solution: `function evalExpr(expr) {\n  let tokens = expr.split(' ')\n  // First pass: handle * and /\n  let i = 0\n  while (i < tokens.length) {\n    if (tokens[i] === '*' || tokens[i] === '/') {\n      const left = Number(tokens[i - 1])\n      const right = Number(tokens[i + 1])\n      const result = tokens[i] === '*' ? left * right : left / right\n      tokens.splice(i - 1, 3, String(result))\n      i = 0 // restart\n    } else {\n      i++\n    }\n  }\n  // Second pass: handle + and -\n  let result = Number(tokens[0])\n  for (let j = 1; j < tokens.length; j += 2) {\n    const op = tokens[j]\n    const val = Number(tokens[j + 1])\n    if (op === '+') result += val\n    else if (op === '-') result -= val\n  }\n  return result\n}`,
+      hints: [
+        'Split the expression by spaces to get an array of tokens (numbers and operators)',
+        'First loop through the tokens and handle all * and / operations, collapsing those tokens into a single result',
+        'Then loop through the remaining tokens to handle + and - from left to right',
+      ],
+      testCases: [
+        { description: 'evalExpr("2 + 3 * 4") returns 14', test: 'return evalExpr("2 + 3 * 4") === 14', input: '"2 + 3 * 4"', expected: '14' },
+        { description: 'evalExpr("10 - 2 * 3") returns 4', test: 'return evalExpr("10 - 2 * 3") === 4', input: '"10 - 2 * 3"', expected: '4' },
+        { description: 'evalExpr("6 / 2 + 1") returns 4', test: 'return evalExpr("6 / 2 + 1") === 4', input: '"6 / 2 + 1"', expected: '4' },
+        { description: 'evalExpr("5 + 3") returns 8', test: 'return evalExpr("5 + 3") === 8', input: '"5 + 3"', expected: '8' },
+        { description: 'evalExpr("4 * 3 - 2") returns 10', test: 'return evalExpr("4 * 3 - 2") === 10', input: '"4 * 3 - 2"', expected: '10' },
+      ],
+      concepts: ['operator precedence', 'parsing', 'arrays', 'arithmetic operators', 'algorithms'],
+    },
+  ],
+
+  questions: [
+    {
+      id: 'q-03-1',
+      question: 'What does the modulo operator `%` return?',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: 'The percentage of the first number', correct: false },
+        { id: 'b', text: 'The quotient of integer division', correct: false },
+        { id: 'c', text: 'The remainder after dividing the first number by the second', correct: true },
+        { id: 'd', text: 'The absolute difference between two numbers', correct: false },
+      ],
+      explanation: 'The modulo operator returns the remainder of division. For example, 10 % 3 = 1 because 10 / 3 is 3 with a remainder of 1. It is commonly used to check if a number is even (n % 2 === 0).',
+    },
+    {
+      id: 'q-03-2',
+      question: 'What is the result of `5 == "5"` in JavaScript?',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: 'false, because they are different types', correct: false },
+        { id: 'b', text: 'true, because == performs type coercion', correct: true },
+        { id: 'c', text: 'throws a TypeError', correct: false },
+        { id: 'd', text: 'undefined', correct: false },
+      ],
+      explanation: 'The == operator (loose equality) performs type coercion before comparing. It converts "5" (string) to 5 (number) and then compares, resulting in true. This is why you should use === (strict equality) to avoid unexpected results.',
+    },
+    {
+      id: 'q-03-3',
+      question: 'What is the correct syntax for a ternary operator?',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: 'condition ?? trueValue : falseValue', correct: false },
+        { id: 'b', text: 'if condition then trueValue else falseValue', correct: false },
+        { id: 'c', text: 'condition ? trueValue : falseValue', correct: true },
+        { id: 'd', text: 'condition -> trueValue | falseValue', correct: false },
+      ],
+      explanation: 'The ternary operator uses the syntax: condition ? valueIfTrue : valueIfFalse. It is a concise way to express an if-else expression in a single line and is great for assigning values based on a condition.',
+    },
+    {
+      id: 'q-03-4',
+      question: 'What does the `&&` operator return when the first operand is falsy?',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: 'Always returns false', correct: false },
+        { id: 'b', text: 'Returns the first falsy value (short-circuits)', correct: true },
+        { id: 'c', text: 'Evaluates and returns the second operand', correct: false },
+        { id: 'd', text: 'Returns undefined', correct: false },
+      ],
+      explanation: 'The && operator short-circuits: if the first operand is falsy, it returns that operand immediately without evaluating the second. For example, `null && someFunction()` returns null without calling someFunction. If the first is truthy, it returns the second operand.',
+    },
+    {
+      id: 'q-03-5',
+      question: 'What is the result of `2 + 3 * 4` in JavaScript?',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: '20', correct: false },
+        { id: 'b', text: '14', correct: true },
+        { id: 'c', text: '24', correct: false },
+        { id: 'd', text: '9', correct: false },
+      ],
+      explanation: 'Multiplication (*) has higher precedence than addition (+), so 3 * 4 = 12 is evaluated first, then 2 + 12 = 14. To force a different order, use parentheses: (2 + 3) * 4 = 20.',
+    },
+    {
+      id: 'q-03-6',
+      question: 'Which statement about the `||` (OR) operator is true?',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: 'It always returns a boolean true or false', correct: false },
+        { id: 'b', text: 'It returns the first truthy value, or the last value if none are truthy', correct: true },
+        { id: 'c', text: 'Both operands are always evaluated', correct: false },
+        { id: 'd', text: 'It only works with boolean values', correct: false },
+      ],
+      explanation: 'The || operator returns the first truthy value it encounters, or the last operand if none are truthy. For example, `null || "default"` returns "default". This is commonly used to provide default values. It also short-circuits: if the first value is truthy, the second is never evaluated.',
+    },
+    {
+      id: 'q-03-7',
+      question: 'Which of the following expressions correctly checks if `x` is between 10 and 20 (inclusive)?',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: '10 <= x <= 20', correct: false },
+        { id: 'b', text: 'x >= 10 && x <= 20', correct: true },
+        { id: 'c', text: 'x >= 10 || x <= 20', correct: false },
+        { id: 'd', text: 'x in [10, 20]', correct: false },
+      ],
+      explanation: 'To check a range, use two separate comparisons joined with &&: x >= 10 && x <= 20. The expression 10 <= x <= 20 does not work as expected in JavaScript — it evaluates left to right as (10 <= x) <= 20, which compares a boolean to 20.',
+    },
+    {
+      id: 'q-03-8',
+      question: 'What does the `!` (NOT) operator do?',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: 'Returns the bitwise complement of a number', correct: false },
+        { id: 'b', text: 'Inverts a boolean value — true becomes false, false becomes true', correct: true },
+        { id: 'c', text: 'Checks if a value is null or undefined', correct: false },
+        { id: 'd', text: 'Throws an error if the operand is falsy', correct: false },
+      ],
+      explanation: 'The ! operator negates a boolean: !true is false and !false is true. When applied to non-boolean values, it first converts to boolean, then negates. !!"hello" is true (truthy string → true → true). !!0 is false.',
+    },
+  ],
 }

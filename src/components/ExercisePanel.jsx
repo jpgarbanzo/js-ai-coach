@@ -84,8 +84,27 @@ function ExercisePanel({ exercise, lessonId, onTestResults, onError }) {
               Completed
             </span>
           )}
+          {exercise.difficulty && (
+            <span className={`badge badge-difficulty badge-difficulty--${exercise.difficulty}`}>
+              {exercise.difficulty === 'beginner' ? '🟢 Beginner'
+                : exercise.difficulty === 'medium' ? '🟡 Medium'
+                : '🔴 Hard'}
+            </span>
+          )}
         </div>
         <p className="exercise-description text-secondary">{exercise.description}</p>
+        {exercise.inputSpec && (
+          <div className="io-spec-row">
+            <span className="io-label">Input:</span>
+            <code>{exercise.inputSpec}</code>
+          </div>
+        )}
+        {exercise.outputSpec && (
+          <div className="io-spec-row">
+            <span className="io-label">Returns:</span>
+            <code>{exercise.outputSpec}</code>
+          </div>
+        )}
       </div>
 
       {/* Code editor */}
@@ -415,6 +434,41 @@ function ExercisePanel({ exercise, lessonId, onTestResults, onError }) {
         .solution-code {
           margin: 0;
           font-size: var(--font-size-sm);
+        }
+
+        .badge-difficulty {
+          font-size: var(--font-size-xs);
+          font-weight: var(--font-weight-semibold);
+          padding: 2px 8px;
+          border-radius: var(--border-radius-full);
+          text-transform: capitalize;
+        }
+        .badge-difficulty--beginner {
+          background: #d1fae5;
+          color: #065f46;
+        }
+        .badge-difficulty--medium {
+          background: #fef3c7;
+          color: #92400e;
+        }
+        .badge-difficulty--hard {
+          background: #fee2e2;
+          color: #991b1b;
+        }
+
+        .io-spec-row {
+          display: flex;
+          align-items: baseline;
+          gap: var(--space-2);
+          font-size: var(--font-size-sm);
+          color: var(--text-secondary);
+          margin-top: var(--space-1);
+        }
+        .io-label {
+          font-weight: var(--font-weight-semibold);
+          color: var(--text-primary);
+          min-width: 60px;
+          flex-shrink: 0;
         }
       `}</style>
     </div>

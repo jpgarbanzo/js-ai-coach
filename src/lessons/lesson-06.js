@@ -397,4 +397,288 @@ function formatProduct({ name, price, category = 'general' }) {
       },
     },
   ],
+
+  exercises: [
+    {
+      id: 'ex-06-1',
+      title: 'Create Person',
+      difficulty: 'beginner',
+      description: 'Write a function that returns a person object with a greet method.',
+      inputSpec: 'name: string, age: number',
+      outputSpec: 'object — { name, age, greet: function }',
+      instructions: `
+        <p>Write a function called <code>createPerson</code> that takes a <code>name</code> and <code>age</code>, and returns an object with those properties plus a <code>greet</code> method.</p>
+        <div class="io-spec">
+          <div class="io-spec-row"><span class="io-label">Function:</span> <code>createPerson(name, age)</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>createPerson("Alice", 30).greet() → "Hi, I'm Alice"</code></div>
+        </div>
+        <p>The <code>greet()</code> method should return the string <code>"Hi, I'm {name}"</code> using <code>this.name</code>.</p>
+      `,
+      starterCode: `// Write a function called createPerson\nfunction createPerson(name, age) {\n  // your code here\n}`,
+      solution: `function createPerson(name, age) {\n  return {\n    name,\n    age,\n    greet() {\n      return \`Hi, I'm \${this.name}\`\n    },\n  }\n}`,
+      hints: [
+        'Return an object literal with name, age, and a greet method',
+        'Use shorthand property syntax: { name, age } instead of { name: name, age: age }',
+        'Inside greet(), use this.name to access the object\'s name property',
+      ],
+      testCases: [
+        { description: 'createPerson("Alice", 30).greet() returns "Hi, I\'m Alice"', test: 'return createPerson("Alice", 30).greet() === "Hi, I\'m Alice"', input: '"Alice", 30', expected: '"Hi, I\'m Alice"' },
+        { description: 'createPerson has correct name property', test: 'return createPerson("Bob", 25).name === "Bob"', input: '"Bob", 25', expected: '"Bob"' },
+        { description: 'createPerson has correct age property', test: 'return createPerson("Carol", 20).age === 20', input: '"Carol", 20', expected: '20' },
+        { description: 'greet uses this.name not closure', test: 'const p = createPerson("Dave", 40); p.name = "Eve"; return p.greet() === "Hi, I\'m Eve"', input: 'mutated name', expected: '"Hi, I\'m Eve"' },
+      ],
+      concepts: ['objects', 'methods', 'this', 'shorthand properties', 'template literals'],
+    },
+    {
+      id: 'ex-06-2',
+      title: 'Get Keys',
+      difficulty: 'beginner',
+      description: 'Write a function that returns an array of an object\'s own property keys.',
+      inputSpec: 'obj: object',
+      outputSpec: 'string[] — array of own property names',
+      instructions: `
+        <p>Write a function called <code>getKeys</code> that takes any object and returns an array of its own property names using <code>Object.keys()</code>.</p>
+        <div class="io-spec">
+          <div class="io-spec-row"><span class="io-label">Function:</span> <code>getKeys(obj)</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>getKeys({a: 1, b: 2}) → ["a", "b"]</code></div>
+        </div>
+        <p>Return an empty array for an empty object. The order of keys follows insertion order in modern JavaScript.</p>
+      `,
+      starterCode: `// Write a function called getKeys\nfunction getKeys(obj) {\n  // your code here\n}`,
+      solution: `function getKeys(obj) {\n  return Object.keys(obj)\n}`,
+      hints: [
+        'Use Object.keys(obj) — it returns an array of the object\'s own enumerable property names',
+        'Simply return the result of Object.keys(obj)',
+        'For an empty object {}, Object.keys returns []',
+      ],
+      testCases: [
+        { description: 'getKeys({a:1,b:2}) returns ["a","b"]', test: 'const r = getKeys({a:1,b:2}); return r.includes("a") && r.includes("b") && r.length === 2', input: '{a:1,b:2}', expected: '["a","b"]' },
+        { description: 'getKeys({}) returns []', test: 'return getKeys({}).length === 0', input: '{}', expected: '[]' },
+        { description: 'getKeys({x:1}) returns ["x"]', test: 'const r = getKeys({x:1}); return r.length === 1 && r[0] === "x"', input: '{x:1}', expected: '["x"]' },
+        { description: 'getKeys returns correct count', test: 'return getKeys({a:1,b:2,c:3}).length === 3', input: '{a:1,b:2,c:3}', expected: 'length 3' },
+      ],
+      concepts: ['Object.keys', 'objects', 'arrays'],
+    },
+    {
+      id: 'ex-06-3',
+      title: 'Merge Objects',
+      difficulty: 'beginner',
+      description: 'Write a function that merges two objects, with the second object\'s properties taking precedence.',
+      inputSpec: 'obj1: object, obj2: object',
+      outputSpec: 'object — merged result, obj2 properties override obj1',
+      instructions: `
+        <p>Write a function called <code>mergeObjects</code> that takes two objects and returns a new merged object. Properties from <code>obj2</code> override properties from <code>obj1</code> when they share the same key.</p>
+        <div class="io-spec">
+          <div class="io-spec-row"><span class="io-label">Function:</span> <code>mergeObjects(obj1, obj2)</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>mergeObjects({a:1,b:2}, {b:9,c:3}) → {a:1,b:9,c:3}</code></div>
+        </div>
+        <p>Use the object spread operator. Neither original object should be modified.</p>
+      `,
+      starterCode: `// Write a function called mergeObjects\nfunction mergeObjects(obj1, obj2) {\n  // your code here\n}`,
+      solution: `function mergeObjects(obj1, obj2) {\n  return { ...obj1, ...obj2 }\n}`,
+      hints: [
+        'Use the spread operator to combine both objects into a new one',
+        'Properties from the later spread overwrite earlier ones: { ...obj1, ...obj2 }',
+        'This returns a new object — neither original is modified',
+      ],
+      testCases: [
+        { description: 'mergeObjects({a:1,b:2},{b:9,c:3}) returns {a:1,b:9,c:3}', test: 'const r = mergeObjects({a:1,b:2},{b:9,c:3}); return r.a===1 && r.b===9 && r.c===3', input: '{a:1,b:2}, {b:9,c:3}', expected: '{a:1,b:9,c:3}' },
+        { description: 'mergeObjects does not modify originals', test: 'const o1={a:1}; const o2={b:2}; mergeObjects(o1,o2); return o1.b===undefined && o2.a===undefined', input: 'two separate objects', expected: 'originals unchanged' },
+        { description: 'mergeObjects with empty obj2 returns copy of obj1', test: 'const r = mergeObjects({x:1},{}); return r.x===1', input: '{x:1}, {}', expected: '{x:1}' },
+        { description: 'mergeObjects with empty obj1 returns copy of obj2', test: 'const r = mergeObjects({},{y:2}); return r.y===2', input: '{}, {y:2}', expected: '{y:2}' },
+      ],
+      concepts: ['spread operator', 'object merging', 'immutability'],
+    },
+    {
+      id: 'ex-06-4',
+      title: 'Deep Clone',
+      difficulty: 'medium',
+      description: 'Write a function that returns a deep clone of an object (handles nested objects, no functions).',
+      inputSpec: 'obj: object (no functions, no circular references)',
+      outputSpec: 'object — deep clone with no shared references',
+      instructions: `
+        <p>Write a function called <code>deepClone</code> that returns a deep copy of an object. Unlike the spread operator (shallow copy), a deep clone ensures nested objects are also copied, not shared.</p>
+        <div class="io-spec">
+          <div class="io-spec-row"><span class="io-label">Function:</span> <code>deepClone(obj)</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>deepClone({a: 1, b: {c: 2}}) → {a: 1, b: {c: 2}} (new object)</code></div>
+        </div>
+        <p>You may use <code>JSON.parse(JSON.stringify(obj))</code> as a simple implementation (works for plain objects with no functions or special values). Mutating the clone must not affect the original.</p>
+      `,
+      starterCode: `// Write a function called deepClone\nfunction deepClone(obj) {\n  // your code here\n}`,
+      solution: `function deepClone(obj) {\n  return JSON.parse(JSON.stringify(obj))\n}`,
+      hints: [
+        'Use JSON.stringify to convert the object to a JSON string, then JSON.parse to convert it back',
+        'This creates a completely new object with no shared references to the original',
+        'Note: this does not work for functions, undefined values, or circular references — but works fine for plain data objects',
+      ],
+      testCases: [
+        { description: 'deepClone returns equal structure', test: 'const r = deepClone({a:1,b:{c:2}}); return r.a===1 && r.b.c===2', input: '{a:1,b:{c:2}}', expected: '{a:1,b:{c:2}}' },
+        { description: 'deepClone is not the same reference', test: 'const o={a:1}; const c=deepClone(o); return c !== o', input: '{a:1}', expected: 'different reference' },
+        { description: 'deepClone nested objects are not shared', test: 'const o={a:{b:1}}; const c=deepClone(o); c.a.b=99; return o.a.b===1', input: '{a:{b:1}}', expected: 'o.a.b unchanged at 1' },
+        { description: 'deepClone works on empty object', test: 'const r=deepClone({}); return typeof r === "object" && Object.keys(r).length===0', input: '{}', expected: '{}' },
+      ],
+      concepts: ['deep copy', 'JSON.parse', 'JSON.stringify', 'object references', 'shallow vs deep copy'],
+    },
+    {
+      id: 'ex-06-5',
+      title: 'Invert Object',
+      difficulty: 'medium',
+      description: 'Write a function that returns a new object with keys and values swapped.',
+      inputSpec: 'obj: object (string/number values only)',
+      outputSpec: 'object — keys and values swapped',
+      instructions: `
+        <p>Write a function called <code>invertObject</code> that takes an object and returns a new object where the keys become values and the values become keys.</p>
+        <div class="io-spec">
+          <div class="io-spec-row"><span class="io-label">Function:</span> <code>invertObject(obj)</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>invertObject({a: "x", b: "y"}) → {x: "a", y: "b"}</code></div>
+        </div>
+        <p>Use <code>Object.entries()</code> to get key-value pairs, then build the inverted object. Values in the original object become keys in the result (converted to strings if needed).</p>
+      `,
+      starterCode: `// Write a function called invertObject\nfunction invertObject(obj) {\n  // your code here\n}`,
+      solution: `function invertObject(obj) {\n  const inverted = {}\n  for (const [key, value] of Object.entries(obj)) {\n    inverted[value] = key\n  }\n  return inverted\n}`,
+      hints: [
+        'Use Object.entries(obj) to get an array of [key, value] pairs',
+        'Loop through the entries and swap them: inverted[value] = key',
+        'Return the new inverted object',
+      ],
+      testCases: [
+        { description: 'invertObject({a:"x",b:"y"}) returns {x:"a",y:"b"}', test: 'const r=invertObject({a:"x",b:"y"}); return r.x==="a" && r.y==="b"', input: '{a:"x",b:"y"}', expected: '{x:"a",y:"b"}' },
+        { description: 'invertObject({}) returns {}', test: 'return Object.keys(invertObject({})).length===0', input: '{}', expected: '{}' },
+        { description: 'invertObject({foo:"bar"}) returns {bar:"foo"}', test: 'return invertObject({foo:"bar"}).bar==="foo"', input: '{foo:"bar"}', expected: '{bar:"foo"}' },
+        { description: 'invertObject preserves all pairs', test: 'const r=invertObject({a:"1",b:"2",c:"3"}); return r["1"]==="a" && r["2"]==="b" && r["3"]==="c"', input: '{a:"1",b:"2",c:"3"}', expected: '{1:"a",2:"b",3:"c"}' },
+      ],
+      concepts: ['Object.entries', 'object iteration', 'dynamic keys', 'for...of'],
+    },
+    {
+      id: 'ex-06-6',
+      title: 'Flatten Object',
+      difficulty: 'hard',
+      description: 'Write a function that flattens a nested object into a single-level object with dot-notation keys.',
+      inputSpec: 'obj: object (nested plain objects, no arrays)',
+      outputSpec: 'object — flat object with dot-path keys',
+      instructions: `
+        <p>Write a function called <code>flatten</code> that takes a (potentially nested) object and returns a flat object where nested keys are joined with dots.</p>
+        <div class="io-spec">
+          <div class="io-spec-row"><span class="io-label">Function:</span> <code>flatten(obj)</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>flatten({a: {b: {c: 1}}}) → {"a.b.c": 1}</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>flatten({a: 1, b: {c: 2, d: 3}}) → {a: 1, "b.c": 2, "b.d": 3}</code></div>
+        </div>
+        <p>Use recursion: if a value is a plain object, recurse and prepend the current key with a dot. If it is a primitive, add it directly.</p>
+      `,
+      starterCode: `// Write a function called flatten\nfunction flatten(obj, prefix) {\n  // your code here\n}`,
+      solution: `function flatten(obj, prefix) {\n  const result = {}\n  for (const [key, value] of Object.entries(obj)) {\n    const fullKey = prefix ? \`\${prefix}.\${key}\` : key\n    if (value !== null && typeof value === 'object' && !Array.isArray(value)) {\n      Object.assign(result, flatten(value, fullKey))\n    } else {\n      result[fullKey] = value\n    }\n  }\n  return result\n}`,
+      hints: [
+        'Use a prefix parameter to track the current path (start with empty string or undefined)',
+        'For each key-value pair: if the value is a nested object, recurse with fullKey as the new prefix',
+        'If the value is a primitive, set result[fullKey] = value where fullKey is prefix + "." + key (or just key if no prefix)',
+      ],
+      testCases: [
+        { description: 'flatten({a:{b:{c:1}}}) returns {"a.b.c":1}', test: 'const r=flatten({a:{b:{c:1}}}); return r["a.b.c"]===1 && Object.keys(r).length===1', input: '{a:{b:{c:1}}}', expected: '{"a.b.c":1}' },
+        { description: 'flatten({a:1,b:{c:2}}) returns {a:1,"b.c":2}', test: 'const r=flatten({a:1,b:{c:2}}); return r.a===1 && r["b.c"]===2', input: '{a:1,b:{c:2}}', expected: '{a:1,"b.c":2}' },
+        { description: 'flatten({a:1}) returns {a:1}', test: 'const r=flatten({a:1}); return r.a===1 && Object.keys(r).length===1', input: '{a:1}', expected: '{a:1}' },
+        { description: 'flatten({}) returns {}', test: 'return Object.keys(flatten({})).length===0', input: '{}', expected: '{}' },
+        { description: 'flatten multi-level nesting', test: 'const r=flatten({x:{y:{z:42}}}); return r["x.y.z"]===42', input: '{x:{y:{z:42}}}', expected: '{"x.y.z":42}' },
+      ],
+      concepts: ['recursion', 'Object.entries', 'object flattening', 'dot notation', 'Object.assign'],
+    },
+  ],
+
+  questions: [
+    {
+      id: 'q-06-1',
+      question: 'What is the difference between dot notation and bracket notation for accessing object properties?',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: 'Dot notation is read-only; bracket notation allows writing', correct: false },
+        { id: 'b', text: 'Bracket notation allows using variables and special characters as keys; dot notation requires valid identifier names', correct: true },
+        { id: 'c', text: 'They are always interchangeable', correct: false },
+        { id: 'd', text: 'Bracket notation is only for arrays; dot notation is only for objects', correct: false },
+      ],
+      explanation: 'Dot notation (obj.key) is cleaner but only works with valid identifier names. Bracket notation (obj["key"] or obj[variable]) is required when the key contains spaces or special characters, is a number, or is stored in a variable.',
+    },
+    {
+      id: 'q-06-2',
+      question: 'What does `this` refer to inside an object method?',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: 'The global window object', correct: false },
+        { id: 'b', text: 'The function itself', correct: false },
+        { id: 'c', text: 'The object that owns the method', correct: true },
+        { id: 'd', text: 'undefined', correct: false },
+      ],
+      explanation: 'Inside a regular method, `this` refers to the object the method belongs to. For example, in `person.greet()`, `this` inside `greet` refers to `person`. Note: arrow functions do not have their own `this` — they inherit it from the surrounding scope.',
+    },
+    {
+      id: 'q-06-3',
+      question: 'How do you delete a property from an object?',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: 'obj.key = null', correct: false },
+        { id: 'b', text: 'obj.key = undefined', correct: false },
+        { id: 'c', text: 'delete obj.key', correct: true },
+        { id: 'd', text: 'remove(obj.key)', correct: false },
+      ],
+      explanation: 'The `delete` operator removes a property from an object: `delete obj.key`. Setting a property to null or undefined still keeps the property in the object (just with a null/undefined value). There is no remove() function for objects in JavaScript.',
+    },
+    {
+      id: 'q-06-4',
+      question: 'What do `Object.keys()`, `Object.values()`, and `Object.entries()` return?',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: 'They all return the same thing — an array of the object\'s properties', correct: false },
+        { id: 'b', text: 'keys() returns property names, values() returns property values, entries() returns [key, value] pair arrays', correct: true },
+        { id: 'c', text: 'keys() returns a number, values() returns an array, entries() returns an object', correct: false },
+        { id: 'd', text: 'They modify the object and return it', correct: false },
+      ],
+      explanation: 'Object.keys(obj) returns an array of property names. Object.values(obj) returns an array of property values. Object.entries(obj) returns an array of [key, value] pair arrays. All three are useful for iterating over objects.',
+    },
+    {
+      id: 'q-06-5',
+      question: 'What is the difference between a shallow copy and a deep copy of an object?',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: 'A shallow copy is faster but creates a completely independent copy', correct: false },
+        { id: 'b', text: 'A shallow copy copies only top-level properties; nested objects are still shared references. A deep copy duplicates everything recursively.', correct: true },
+        { id: 'c', text: 'They are the same thing', correct: false },
+        { id: 'd', text: 'A shallow copy uses less memory in all cases', correct: false },
+      ],
+      explanation: 'A shallow copy (like spread: {...obj}) copies the top-level properties, but nested objects still point to the same reference. Modifying a nested property in the copy also changes the original. A deep copy (like JSON.parse(JSON.stringify(obj))) creates entirely new nested objects.',
+    },
+    {
+      id: 'q-06-6',
+      question: 'What does object destructuring do?',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: 'Converts an object to an array', correct: false },
+        { id: 'b', text: 'Deletes properties from an object', correct: false },
+        { id: 'c', text: 'Extracts properties from an object into named variables', correct: true },
+        { id: 'd', text: 'Creates a frozen (immutable) copy of the object', correct: false },
+      ],
+      explanation: 'Object destructuring syntax `const { name, age } = person` creates variables named `name` and `age` with the values from the person object. You can also rename (`const { name: n } = person`) or provide defaults (`const { country = "USA" } = person`).',
+    },
+    {
+      id: 'q-06-7',
+      question: 'What happens when you use the spread operator to merge two objects that have the same key?',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: 'The first value is kept', correct: false },
+        { id: 'b', text: 'An error is thrown', correct: false },
+        { id: 'c', text: 'The later spread overwrites the earlier value', correct: true },
+        { id: 'd', text: 'Both values are merged into an array', correct: false },
+      ],
+      explanation: 'When spreading objects, later properties overwrite earlier ones with the same key: `{ ...{a:1, b:2}, ...{b:9} }` results in `{a:1, b:9}`. This makes the spread operator useful for applying updates: `{ ...original, updatedProp: newValue }`.',
+    },
+    {
+      id: 'q-06-8',
+      question: 'Which of the following are valid ways to create an object in JavaScript? (Select all that apply)',
+      multiSelect: true,
+      options: [
+        { id: 'a', text: 'const obj = { key: value }', correct: true },
+        { id: 'b', text: 'const obj = new Object()', correct: true },
+        { id: 'c', text: 'const obj = Object.create(null)', correct: true },
+        { id: 'd', text: 'const obj = object { key: value }', correct: false },
+      ],
+      explanation: 'Objects can be created with an object literal ({ key: value }), using the Object constructor (new Object()), or using Object.create(). The `object { }` syntax does not exist in JavaScript. Object literals are the most common and concise approach.',
+    },
+  ],
 }

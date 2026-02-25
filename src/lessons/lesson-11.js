@@ -665,4 +665,304 @@ class Counter {
       },
     },
   ],
+
+  exercises: [
+    {
+      id: 'ex-11-1',
+      title: 'Rectangle Class',
+      difficulty: 'beginner',
+      description: 'Create a Rectangle class with area and perimeter methods.',
+      inputSpec: 'constructor(w: number, h: number)',
+      outputSpec: 'Rectangle instance with area() and perimeter() methods',
+      instructions: `
+        <p>Implement a <code>Rectangle</code> class that stores width and height and provides methods to calculate area and perimeter.</p>
+        <div class="io-spec">
+          <div class="io-spec-row"><span class="io-label">Class:</span> <code>Rectangle</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>new Rectangle(4, 5).area() → 20</code></div>
+        </div>
+        <p>Methods: <code>area()</code> returns width * height; <code>perimeter()</code> returns 2 * (width + height). Store width and height as instance properties in the constructor.</p>
+      `,
+      starterCode: `// Write a class called Rectangle\nclass Rectangle {\n  constructor(w, h) {\n    // your code here\n  }\n\n  area() {\n    // your code here\n  }\n\n  perimeter() {\n    // your code here\n  }\n}`,
+      solution: `class Rectangle {\n  constructor(w, h) {\n    this.w = w\n    this.h = h\n  }\n\n  area() {\n    return this.w * this.h\n  }\n\n  perimeter() {\n    return 2 * (this.w + this.h)\n  }\n}`,
+      hints: [
+        'In the constructor, assign this.w = w and this.h = h',
+        'area() returns this.w * this.h',
+        'perimeter() returns 2 * (this.w + this.h)',
+      ],
+      testCases: [
+        { description: 'area() returns width * height', test: 'return new Rectangle(4, 5).area() === 20', input: 'new Rectangle(4, 5)', expected: '20' },
+        { description: 'perimeter() returns 2*(w+h)', test: 'return new Rectangle(4, 5).perimeter() === 18', input: 'new Rectangle(4, 5)', expected: '18' },
+        { description: 'area works with square', test: 'return new Rectangle(3, 3).area() === 9', input: 'new Rectangle(3, 3)', expected: '9' },
+        { description: 'each instance is independent', test: 'const a = new Rectangle(2, 3); const b = new Rectangle(10, 10); return a.area() === 6 && b.area() === 100', input: 'two instances', expected: '6 and 100' },
+      ],
+      concepts: ['class', 'constructor', 'methods', 'this', 'arithmetic'],
+    },
+    {
+      id: 'ex-11-2',
+      title: 'Stack Class',
+      difficulty: 'beginner',
+      description: 'Implement a Stack data structure using a class.',
+      inputSpec: 'Stack class (no constructor arguments needed)',
+      outputSpec: 'Stack instance with push, pop, peek, isEmpty, and size getter',
+      instructions: `
+        <p>Implement a <code>Stack</code> class that follows the Last-In-First-Out (LIFO) principle.</p>
+        <div class="io-spec">
+          <div class="io-spec-row"><span class="io-label">Class:</span> <code>Stack</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>const s = new Stack(); s.push(1); s.push(2); s.pop() → 2</code></div>
+        </div>
+        <p>Methods: <code>push(val)</code> adds to the top; <code>pop()</code> removes and returns the top value (or <code>undefined</code> if empty); <code>peek()</code> returns the top without removing it (or <code>undefined</code>); <code>isEmpty()</code> returns a boolean. Add a <code>size</code> getter that returns the number of items.</p>
+      `,
+      starterCode: `// Write a class called Stack\nclass Stack {\n  constructor() {\n    // your code here\n  }\n\n  push(val) {\n    // your code here\n  }\n\n  pop() {\n    // your code here\n  }\n\n  peek() {\n    // your code here\n  }\n\n  isEmpty() {\n    // your code here\n  }\n\n  get size() {\n    // your code here\n  }\n}`,
+      solution: `class Stack {\n  constructor() {\n    this._items = []\n  }\n\n  push(val) {\n    this._items.push(val)\n  }\n\n  pop() {\n    return this._items.pop()\n  }\n\n  peek() {\n    return this._items[this._items.length - 1]\n  }\n\n  isEmpty() {\n    return this._items.length === 0\n  }\n\n  get size() {\n    return this._items.length\n  }\n}`,
+      hints: [
+        'Store items in an internal array: this._items = []',
+        'push() appends to the array; pop() removes from the end',
+        'peek() returns the last element without removing it: this._items[this._items.length - 1]',
+      ],
+      testCases: [
+        { description: 'pop() returns last pushed value', test: 'const s = new Stack(); s.push(1); s.push(2); return s.pop() === 2', input: 'push(1), push(2), pop()', expected: '2' },
+        { description: 'peek() returns top without removing', test: 'const s = new Stack(); s.push(5); return s.peek() === 5 && s.size === 1', input: 'push(5), peek()', expected: '5 and size still 1' },
+        { description: 'isEmpty() returns true on new stack', test: 'return new Stack().isEmpty() === true', input: 'new Stack()', expected: 'true' },
+        { description: 'size getter tracks item count', test: 'const s = new Stack(); s.push("a"); s.push("b"); return s.size === 2', input: 'push twice', expected: '2' },
+        { description: 'pop() returns undefined when empty', test: 'return new Stack().pop() === undefined', input: 'pop on empty stack', expected: 'undefined' },
+      ],
+      concepts: ['class', 'constructor', 'methods', 'getters', 'arrays', 'stack data structure'],
+    },
+    {
+      id: 'ex-11-3',
+      title: 'Counter Class',
+      difficulty: 'beginner',
+      description: 'Build a Counter class with increment, decrement, reset, and a value getter.',
+      inputSpec: 'constructor(start?: number) — default start is 0',
+      outputSpec: 'Counter instance with increment(), decrement(), reset(), and value getter',
+      instructions: `
+        <p>Implement a <code>Counter</code> class that tracks a numeric count with a configurable starting value.</p>
+        <div class="io-spec">
+          <div class="io-spec-row"><span class="io-label">Class:</span> <code>Counter</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>const c = new Counter(5); c.increment(); c.value → 6</code></div>
+        </div>
+        <p><code>increment()</code> increases the count by 1; <code>decrement()</code> decreases it by 1; <code>reset()</code> returns the count to the original start value; <code>value</code> is a getter that returns the current count.</p>
+      `,
+      starterCode: `// Write a class called Counter\nclass Counter {\n  constructor(start = 0) {\n    // your code here\n  }\n\n  increment() {\n    // your code here\n  }\n\n  decrement() {\n    // your code here\n  }\n\n  reset() {\n    // your code here\n  }\n\n  get value() {\n    // your code here\n  }\n}`,
+      solution: `class Counter {\n  constructor(start = 0) {\n    this._start = start\n    this._count = start\n  }\n\n  increment() {\n    this._count++\n  }\n\n  decrement() {\n    this._count--\n  }\n\n  reset() {\n    this._count = this._start\n  }\n\n  get value() {\n    return this._count\n  }\n}`,
+      hints: [
+        'Store both the start value and the current count: this._start = start; this._count = start',
+        'increment() and decrement() modify this._count by ±1',
+        'reset() assigns this._count = this._start to return to the original value',
+      ],
+      testCases: [
+        { description: 'starts at default 0', test: 'return new Counter().value === 0', input: 'new Counter()', expected: '0' },
+        { description: 'starts at given value', test: 'return new Counter(10).value === 10', input: 'new Counter(10)', expected: '10' },
+        { description: 'increment() increases value', test: 'const c = new Counter(); c.increment(); return c.value === 1', input: 'increment once', expected: '1' },
+        { description: 'decrement() decreases value', test: 'const c = new Counter(5); c.decrement(); return c.value === 4', input: 'decrement from 5', expected: '4' },
+        { description: 'reset() returns to start', test: 'const c = new Counter(3); c.increment(); c.increment(); c.reset(); return c.value === 3', input: 'increment twice then reset', expected: '3' },
+      ],
+      concepts: ['class', 'constructor', 'default parameters', 'methods', 'getters', 'this'],
+    },
+    {
+      id: 'ex-11-4',
+      title: 'Animal and Dog Inheritance',
+      difficulty: 'medium',
+      description: 'Extend an Animal base class with a Dog subclass that overrides speak() and adds fetch().',
+      inputSpec: 'Animal(name: string), Dog extends Animal',
+      outputSpec: 'Dog instance with inherited name, overridden speak(), and new fetch() method',
+      instructions: `
+        <p>Implement two classes:</p>
+        <p><strong>Base class <code>Animal</code>:</strong> constructor takes <code>name</code> and sets <code>this.name</code>. Has a <code>speak()</code> method returning <code>"..."</code>.</p>
+        <p><strong>Derived class <code>Dog</code> extends Animal:</strong> constructor calls <code>super(name)</code>. Overrides <code>speak()</code> to return <code>"Woof! I'm [name]"</code>. Adds <code>fetch()</code> returning <code>"[name] fetches the ball"</code>.</p>
+        <div class="io-spec">
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>new Dog("Rex").speak() → "Woof! I'm Rex"</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>new Dog("Rex").fetch() → "Rex fetches the ball"</code></div>
+        </div>
+      `,
+      starterCode: `// Write your classes here\nclass Animal {\n  constructor(name) {\n    // your code here\n  }\n\n  speak() {\n    // return "..."\n  }\n}\n\nclass Dog extends Animal {\n  constructor(name) {\n    // your code here\n  }\n\n  speak() {\n    // return "Woof! I'm [name]"\n  }\n\n  fetch() {\n    // return "[name] fetches the ball"\n  }\n}`,
+      solution: `class Animal {\n  constructor(name) {\n    this.name = name\n  }\n\n  speak() {\n    return '...'\n  }\n}\n\nclass Dog extends Animal {\n  constructor(name) {\n    super(name)\n  }\n\n  speak() {\n    return \`Woof! I'm \${this.name}\`\n  }\n\n  fetch() {\n    return \`\${this.name} fetches the ball\`\n  }\n}`,
+      hints: [
+        'Animal constructor: this.name = name; speak() returns "..."',
+        'Dog constructor must call super(name) before using this',
+        'Dog speak() uses a template literal: `Woof! I\'m ${this.name}`; fetch() uses: `${this.name} fetches the ball`',
+      ],
+      testCases: [
+        { description: 'Animal.speak() returns "..."', test: 'return new Animal("Cat").speak() === "..."', input: 'new Animal("Cat")', expected: '"..."' },
+        { description: 'Dog.speak() returns overridden message', test: 'return new Dog("Rex").speak() === "Woof! I\'m Rex"', input: 'new Dog("Rex")', expected: '"Woof! I\'m Rex"' },
+        { description: 'Dog.fetch() returns fetch message', test: 'return new Dog("Buddy").fetch() === "Buddy fetches the ball"', input: 'new Dog("Buddy")', expected: '"Buddy fetches the ball"' },
+        { description: 'Dog inherits name from Animal', test: 'return new Dog("Max").name === "Max"', input: 'new Dog("Max")', expected: '"Max"' },
+        { description: 'Dog is an instance of Animal', test: 'return new Dog("X") instanceof Animal', input: 'instanceof check', expected: 'true' },
+      ],
+      concepts: ['extends', 'super', 'inheritance', 'method overriding', 'instanceof'],
+    },
+    {
+      id: 'ex-11-5',
+      title: 'BankAccount with Private Balance',
+      difficulty: 'medium',
+      description: 'Create a BankAccount class with a private #balance field, deposit/withdraw methods, a balance getter, and a static factory.',
+      inputSpec: 'constructor(initialBalance: number)',
+      outputSpec: 'BankAccount instance — deposit, withdraw, balance getter, static fromJSON',
+      instructions: `
+        <p>Implement a <code>BankAccount</code> class that uses a private field for security.</p>
+        <div class="io-spec">
+          <div class="io-spec-row"><span class="io-label">Class:</span> <code>BankAccount</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>const acc = new BankAccount(100); acc.deposit(50); acc.balance → 150</code></div>
+        </div>
+        <p>Requirements: <code>#balance</code> is a private field; <code>deposit(amt)</code> adds to balance; <code>withdraw(amt)</code> throws <code>Error("Insufficient funds")</code> if <code>amt > #balance</code>, otherwise subtracts; <code>balance</code> is a getter returning <code>#balance</code>; <code>static fromJSON({balance})</code> factory creates a new instance.</p>
+      `,
+      starterCode: `// Write a class called BankAccount\nclass BankAccount {\n  #balance\n\n  constructor(initialBalance) {\n    // your code here\n  }\n\n  deposit(amt) {\n    // your code here\n  }\n\n  withdraw(amt) {\n    // throws if insufficient, otherwise subtracts\n  }\n\n  get balance() {\n    // your code here\n  }\n\n  static fromJSON(data) {\n    // create a new BankAccount from { balance } object\n  }\n}`,
+      solution: `class BankAccount {\n  #balance\n\n  constructor(initialBalance) {\n    this.#balance = initialBalance\n  }\n\n  deposit(amt) {\n    this.#balance += amt\n  }\n\n  withdraw(amt) {\n    if (amt > this.#balance) throw new Error('Insufficient funds')\n    this.#balance -= amt\n  }\n\n  get balance() {\n    return this.#balance\n  }\n\n  static fromJSON(data) {\n    return new BankAccount(data.balance)\n  }\n}`,
+      hints: [
+        'Declare #balance at the top of the class, initialize it in the constructor',
+        'withdraw throws: if (amt > this.#balance) throw new Error("Insufficient funds")',
+        'fromJSON is static: static fromJSON({ balance }) { return new BankAccount(balance) }',
+      ],
+      testCases: [
+        { description: 'deposit increases balance', test: 'const acc = new BankAccount(100); acc.deposit(50); return acc.balance === 150', input: 'deposit(50) from 100', expected: '150' },
+        { description: 'withdraw decreases balance', test: 'const acc = new BankAccount(100); acc.withdraw(30); return acc.balance === 70', input: 'withdraw(30) from 100', expected: '70' },
+        { description: 'withdraw throws when insufficient', test: 'const acc = new BankAccount(50); try { acc.withdraw(100); return false } catch(e) { return e.message === "Insufficient funds" }', input: 'withdraw(100) from 50', expected: 'throws "Insufficient funds"' },
+        { description: 'fromJSON creates instance with correct balance', test: 'const acc = BankAccount.fromJSON({ balance: 250 }); return acc.balance === 250', input: 'fromJSON({balance:250})', expected: '250' },
+        { description: '#balance is not directly accessible', test: 'const acc = new BankAccount(100); return acc["#balance"] === undefined', input: 'access #balance externally', expected: 'undefined' },
+      ],
+      concepts: ['private fields', '#', 'getters', 'static methods', 'factory pattern', 'throw'],
+    },
+    {
+      id: 'ex-11-6',
+      title: 'EventEmitter Class',
+      difficulty: 'hard',
+      description: 'Implement an EventEmitter class with on, off, emit, and once methods.',
+      inputSpec: 'EventEmitter class with on(event, listener), off(event, listener), emit(event, ...args), once(event, listener)',
+      outputSpec: 'EventEmitter instance that manages event subscriptions and dispatches events',
+      instructions: `
+        <p>Implement a classic <code>EventEmitter</code> class that allows subscribing to, emitting, and unsubscribing from named events.</p>
+        <div class="io-spec">
+          <div class="io-spec-row"><span class="io-label">Class:</span> <code>EventEmitter</code></div>
+          <div class="io-spec-row"><span class="io-label">Example:</span> <code>const e = new EventEmitter(); e.on("click", fn); e.emit("click", 42)</code></div>
+        </div>
+        <p>Methods: <code>on(event, listener)</code> registers a listener; <code>off(event, listener)</code> removes a specific listener; <code>emit(event, ...args)</code> calls all listeners for the event with the given args; <code>once(event, listener)</code> registers a listener that automatically removes itself after firing once.</p>
+      `,
+      starterCode: `// Write a class called EventEmitter\nclass EventEmitter {\n  constructor() {\n    // your code here\n  }\n\n  on(event, listener) {\n    // your code here\n  }\n\n  off(event, listener) {\n    // your code here\n  }\n\n  emit(event, ...args) {\n    // your code here\n  }\n\n  once(event, listener) {\n    // your code here\n  }\n}`,
+      solution: `class EventEmitter {\n  constructor() {\n    this._events = {}\n  }\n\n  on(event, listener) {\n    if (!this._events[event]) this._events[event] = []\n    this._events[event].push(listener)\n  }\n\n  off(event, listener) {\n    if (!this._events[event]) return\n    this._events[event] = this._events[event].filter(l => l !== listener)\n  }\n\n  emit(event, ...args) {\n    if (!this._events[event]) return\n    this._events[event].forEach(l => l(...args))\n  }\n\n  once(event, listener) {\n    const wrapper = (...args) => {\n      listener(...args)\n      this.off(event, wrapper)\n    }\n    this.on(event, wrapper)\n  }\n}`,
+      hints: [
+        'Store listeners in an object keyed by event name: this._events = {}',
+        'on() pushes the listener into the array for that event; off() filters it out by reference equality',
+        'once() creates a wrapper function that calls the listener then calls this.off() to remove itself',
+      ],
+      testCases: [
+        { description: 'on() registers a listener that fires on emit()', test: 'const e = new EventEmitter(); let called = false; e.on("x", () => { called = true }); e.emit("x"); return called', input: 'on then emit', expected: 'listener called' },
+        { description: 'emit() passes arguments to listeners', test: 'const e = new EventEmitter(); let val; e.on("data", v => { val = v }); e.emit("data", 42); return val === 42', input: 'emit with arg 42', expected: '42 received' },
+        { description: 'off() removes the listener', test: 'const e = new EventEmitter(); let n = 0; const fn = () => n++; e.on("x", fn); e.off("x", fn); e.emit("x"); return n === 0', input: 'on, off, then emit', expected: 'listener not called' },
+        { description: 'once() listener fires exactly once', test: 'const e = new EventEmitter(); let n = 0; e.once("x", () => n++); e.emit("x"); e.emit("x"); return n === 1', input: 'emit twice after once()', expected: 'n === 1' },
+        { description: 'multiple listeners for same event all fire', test: 'const e = new EventEmitter(); let n = 0; e.on("x", () => n++); e.on("x", () => n++); e.emit("x"); return n === 2', input: 'two listeners, one emit', expected: 'n === 2' },
+      ],
+      concepts: ['classes', 'event emitter pattern', 'closures', 'higher-order functions', 'filter', 'forEach'],
+    },
+  ],
+
+  questions: [
+    {
+      id: 'q-11-1',
+      question: 'What is the primary difference between class syntax and the older constructor function approach?',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: 'Classes create truly different objects; constructor functions create plain objects', correct: false },
+        { id: 'b', text: 'Class syntax is syntactic sugar over prototypal inheritance — it is cleaner to write but works the same way under the hood', correct: true },
+        { id: 'c', text: 'Classes cannot inherit from other classes; constructor functions can', correct: false },
+        { id: 'd', text: 'Constructor functions are faster because they skip the prototype chain', correct: false },
+      ],
+      explanation: 'ES6 classes are syntactic sugar over JavaScript\'s existing prototype-based inheritance. Under the hood, a class creates the same prototype chain as a constructor function. Classes provide cleaner syntax, mandatory new-keyword enforcement, and built-in support for super, but the runtime behavior is identical.',
+    },
+    {
+      id: 'q-11-2',
+      question: 'What does the constructor method do in a class?',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: 'It defines static methods on the class', correct: false },
+        { id: 'b', text: 'It runs automatically when new ClassName() is called and is used to initialize instance properties', correct: true },
+        { id: 'c', text: 'It runs once when the file is loaded, not when instances are created', correct: false },
+        { id: 'd', text: 'It is optional and has no special behavior in a class', correct: false },
+      ],
+      explanation: 'The constructor is a special method called automatically each time new ClassName() is invoked. It sets up instance-specific properties on the newly created object (referenced as this). If no constructor is defined, a default empty one is used automatically.',
+    },
+    {
+      id: 'q-11-3',
+      question: 'What is the difference between an instance method and a static method?',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: 'Instance methods use arrow function syntax; static methods use regular function syntax', correct: false },
+        { id: 'b', text: 'Instance methods are called on objects (instances); static methods are called on the class itself and do not have access to "this" as an instance', correct: true },
+        { id: 'c', text: 'Static methods are private; instance methods are public', correct: false },
+        { id: 'd', text: 'They are identical — "static" is just a naming convention', correct: false },
+      ],
+      explanation: 'Instance methods live on the prototype and are called via an object: myObj.method(). Static methods are attached to the class constructor itself and called via the class: MyClass.method(). Static methods are useful for utility functions and factory methods that don\'t need per-instance state.',
+    },
+    {
+      id: 'q-11-4',
+      question: 'How do you define a getter in a class, and how is it accessed?',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: 'With the get keyword before the method name; accessed as a property (no parentheses)', correct: true },
+        { id: 'b', text: 'With the getter keyword; accessed by calling it like a method: obj.getterName()', correct: false },
+        { id: 'c', text: 'Getters are defined in the constructor with this.getX = () => x', correct: false },
+        { id: 'd', text: 'With an @ decorator; no special access syntax needed', correct: false },
+      ],
+      explanation: 'Getters use the get keyword: get fullName() { return this.first + " " + this.last; }. They are accessed without parentheses — obj.fullName — as if they were a regular property. This lets you compute a value on access without exposing the underlying storage.',
+    },
+    {
+      id: 'q-11-5',
+      question: 'When extending a class, what must you do before using "this" in the subclass constructor?',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: 'Call Object.assign(this, parent)', correct: false },
+        { id: 'b', text: 'Call super() to invoke the parent constructor', correct: true },
+        { id: 'c', text: 'Call parent.constructor()', correct: false },
+        { id: 'd', text: 'Nothing special is needed — this is automatically available', correct: false },
+      ],
+      explanation: 'In a derived class (one using extends), you must call super() before accessing this in the constructor. This is because the parent constructor is responsible for setting up the object. If you try to access this before super(), JavaScript throws a ReferenceError.',
+    },
+    {
+      id: 'q-11-6',
+      question: 'What does super.method() do inside a subclass?',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: 'Creates a new instance of the parent class', correct: false },
+        { id: 'b', text: 'Calls the method defined on the parent class, even if the subclass overrides it', correct: true },
+        { id: 'c', text: 'Deletes the parent method from the prototype chain', correct: false },
+        { id: 'd', text: 'Copies the parent method to the child class', correct: false },
+      ],
+      explanation: 'super.method() calls the parent class\'s version of a method. This is useful when overriding a method but still wanting to include the parent\'s behavior: e.g., describe() { return super.describe() + ", more info"; }',
+    },
+    {
+      id: 'q-11-7',
+      question: 'What makes private class fields (#) different from the underscore naming convention (_)?',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: 'Both are enforced by the JavaScript engine; they differ only in syntax', correct: false },
+        { id: 'b', text: 'Private fields (#) are enforced by the language and cannot be accessed outside the class; underscore (_) is only a naming convention with no enforcement', correct: true },
+        { id: 'c', text: 'Underscore fields are removed from the object after construction; # fields persist', correct: false },
+        { id: 'd', text: 'They behave identically at runtime — the difference is only cosmetic', correct: false },
+      ],
+      explanation: 'The underscore prefix (_name) is a community convention signaling "treat this as private" but it is fully accessible from outside the class. Private fields (#name) are a language feature: any attempt to access them outside the class body throws a SyntaxError or TypeError, providing true encapsulation.',
+    },
+    {
+      id: 'q-11-8',
+      question: 'Which of the following about method overriding in JavaScript classes are true? (Select all that apply)',
+      multiSelect: true,
+      options: [
+        { id: 'a', text: 'A subclass method with the same name as a parent method automatically overrides it', correct: true },
+        { id: 'b', text: 'You can call the parent\'s version using super.methodName()', correct: true },
+        { id: 'c', text: 'You must explicitly declare override with the "override" keyword', correct: false },
+        { id: 'd', text: 'Overriding changes the parent class method for all other subclasses', correct: false },
+      ],
+      explanation: 'JavaScript uses prototypal lookup: when a method is called on an instance, the engine finds the first match in the prototype chain. If a subclass defines the same method name, it "shadows" the parent version. You can still call the parent version via super.method(). There is no override keyword in standard JavaScript, and overriding does not affect other classes.',
+    },
+    {
+      id: 'q-11-9',
+      question: 'What does the instanceof operator check?',
+      multiSelect: false,
+      options: [
+        { id: 'a', text: 'Whether a value is of a specific primitive type (like typeof)', correct: false },
+        { id: 'b', text: 'Whether an object was created using a specific class or constructor, by checking the prototype chain', correct: true },
+        { id: 'c', text: 'Whether a method exists on an object', correct: false },
+        { id: 'd', text: 'Whether two objects have the same properties', correct: false },
+      ],
+      explanation: 'instanceof checks whether the prototype of a constructor appears anywhere in the prototype chain of an object. So dog instanceof Animal is true even if dog was created with a Dog class that extends Animal. It traverses the chain, not just the immediate constructor.',
+    },
+  ],
 }
