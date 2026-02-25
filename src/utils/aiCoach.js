@@ -19,19 +19,58 @@ import { pipeline } from '@huggingface/transformers'
  */
 export const AVAILABLE_MODELS = [
   {
+    id: 'qwen-coder-1.5b',
+    name: 'Qwen2.5-Coder 1.5B',
+    description: 'Best balance of quality and size. Code-specialized model trained on 5.5T code tokens. Strong JavaScript understanding. ~1.34 GB download.',
+    huggingfaceId: 'onnx-community/Qwen2.5-Coder-1.5B-Instruct',
+    taskType: 'text-generation',
+    dtype: 'q4f16',
+    memoryMB: 1340,
+    recommended: true,
+  },
+  {
+    id: 'qwen-coder-0.5b',
+    name: 'Qwen2.5-Coder 0.5B',
+    description: 'Smallest code-specialized option. Fast and lightweight for quick hints. ~555 MB download.',
+    huggingfaceId: 'onnx-community/Qwen2.5-Coder-0.5B-Instruct',
+    taskType: 'text-generation',
+    dtype: 'q4f16',
+    memoryMB: 555,
+  },
+  {
+    id: 'deepseek-coder-1.3b',
+    name: 'DeepSeek-Coder 1.3B',
+    description: 'Code-focused model trained on 87% code data. Well-known in the developer community. ~853 MB download.',
+    huggingfaceId: 'onnx-community/deepseek-coder-1.3b-instruct-ONNX',
+    taskType: 'text-generation',
+    dtype: 'q4f16',
+    memoryMB: 853,
+  },
+  {
+    id: 'qwen-coder-3b',
+    name: 'Qwen2.5-Coder 3B',
+    description: 'Highest code quality. Near GPT-3.5 level for JavaScript. ~2.37 GB download. Requires a capable device.',
+    huggingfaceId: 'onnx-community/Qwen2.5-Coder-3B-Instruct',
+    taskType: 'text-generation',
+    dtype: 'q4f16',
+    memoryMB: 2370,
+  },
+  {
     id: 'none',
     name: 'No Coach',
     description: 'Manual evaluation only — no AI hints or feedback.',
     huggingfaceId: null,
     taskType: null,
+    dtype: null,
     memoryMB: 0,
   },
   {
     id: 'tiny',
     name: 'SmolLM2 (135M)',
-    description: 'Fast, lightweight model. Good for quick hints. ~270 MB download.',
+    description: 'Fast, lightweight general model. Good for quick hints. ~270 MB download.',
     huggingfaceId: 'HuggingFaceTB/SmolLM2-135M-Instruct',
     taskType: 'text-generation',
+    dtype: null,
     memoryMB: 270,
   },
   {
@@ -40,6 +79,7 @@ export const AVAILABLE_MODELS = [
     description: 'Higher quality hints and explanations. ~7.6 GB download. Requires a capable device.',
     huggingfaceId: 'microsoft/Phi-3-mini-4k-instruct',
     taskType: 'text-generation',
+    dtype: null,
     memoryMB: 7600,
   },
 ]
@@ -130,9 +170,12 @@ export async function loadModel(modelId, onProgress) {
     }
   }
 
-  const pipe = await pipeline(modelConfig.taskType, modelConfig.huggingfaceId, {
-    progress_callback: progressCallback,
-  })
+  const pipelineOptions = { progress_callback: progressCallback }
+  if (modelConfig.dtype) {
+    pipelineOptions.dtype = modelConfig.dtype
+  }
+
+  const pipe = await pipeline(modelConfig.taskType, modelConfig.huggingfaceId, pipelineOptions)
 
   cachedModel = { modelId, pipe }
   return pipe
@@ -169,11 +212,23 @@ const SYSTEM_PROMPT =
 /**
  * Build a chat-style message array for hint generation.
  */
+/** Strip HTML tags from instructions so they're readable in plain text prompts. */
+function stripHtml(html) {
+  return (html ?? '').replace(/<[^>]+>/g, ' ').replace(/\s{2,}/g, ' ').trim()
+}
+
 function buildHintMessages(exercise, userCode, errorContext) {
   const exerciseInfo = [
     `Exercise: ${exercise.title}`,
+    exercise.difficulty ? `Difficulty: ${exercise.difficulty}` : '',
     `Description: ${exercise.description}`,
-    userCode ? `Student code:\n\`\`\`js\n${userCode}\n\`\`\`` : 'The student has not written any code yet.',
+    exercise.inputSpec  ? `Input:   ${exercise.inputSpec}` : '',
+    exercise.outputSpec ? `Returns: ${exercise.outputSpec}` : '',
+    exercise.instructions ? `Instructions: ${stripHtml(exercise.instructions)}` : '',
+    exercise.testCases?.length
+      ? `Tests the student must pass:\n${exercise.testCases.map((t) => `  - ${t.description}`).join('\n')}`
+      : '',
+    userCode ? `Student's current code:\n\`\`\`js\n${userCode}\n\`\`\`` : 'The student has not written any code yet.',
     errorContext ? `Error or issue: ${errorContext}` : '',
   ]
     .filter(Boolean)
@@ -199,20 +254,25 @@ function buildEvaluationMessages(exercise, userCode, testResults) {
     .map((r) => `  - ${r.passed ? 'PASS' : 'FAIL'}: ${r.description}${r.error ? ` (${r.error})` : ''}`)
     .join('\n')
 
+  const exerciseInfo = [
+    `Exercise: ${exercise.title}`,
+    exercise.difficulty ? `Difficulty: ${exercise.difficulty}` : '',
+    `Description: ${exercise.description}`,
+    exercise.inputSpec  ? `Input:   ${exercise.inputSpec}` : '',
+    exercise.outputSpec ? `Returns: ${exercise.outputSpec}` : '',
+    exercise.instructions ? `Instructions: ${stripHtml(exercise.instructions)}` : '',
+    `Student code:\n\`\`\`js\n${userCode}\n\`\`\``,
+    `Test results (${passedCount}/${totalCount} passed):\n${resultsSummary}`,
+    passedCount === totalCount
+      ? 'All tests passed! Please give positive feedback and one tip to improve the code quality.'
+      : 'Some tests failed. Please explain what is wrong and give a constructive hint.',
+  ]
+    .filter(Boolean)
+    .join('\n\n')
+
   return [
     { role: 'system', content: SYSTEM_PROMPT },
-    {
-      role: 'user',
-      content: [
-        `Exercise: ${exercise.title}`,
-        `Description: ${exercise.description}`,
-        `Student code:\n\`\`\`js\n${userCode}\n\`\`\``,
-        `Test results (${passedCount}/${totalCount} passed):\n${resultsSummary}`,
-        passedCount === totalCount
-          ? 'All tests passed! Please give positive feedback and one tip to improve the code quality.'
-          : 'Some tests failed. Please explain what is wrong and give a constructive hint.',
-      ].join('\n\n'),
-    },
+    { role: 'user', content: exerciseInfo },
   ]
 }
 

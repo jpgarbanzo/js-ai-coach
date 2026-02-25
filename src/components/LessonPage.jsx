@@ -21,6 +21,7 @@ function LessonPage({ lesson, navigateTo, selectedModel }) {
   const [testResults, setTestResults] = useState(null)
   const [errorContext, setErrorContext] = useState(null)
   const [coachMessage, setCoachMessage] = useState(null)
+  const [currentUserCode, setCurrentUserCode] = useState('')
 
   // Support both a top-level `exercises` array and exercises embedded in slides
   const exercises = lesson.exercises?.length
@@ -44,6 +45,7 @@ function LessonPage({ lesson, navigateTo, selectedModel }) {
       setCurrentExerciseIndex((i) => i - 1)
       setTestResults(null)
       setErrorContext(null)
+      setCurrentUserCode('')
     }
   }
 
@@ -51,6 +53,7 @@ function LessonPage({ lesson, navigateTo, selectedModel }) {
     if (currentExerciseIndex < exercises.length - 1) {
       setCurrentExerciseIndex((i) => i + 1)
       setTestResults(null)
+      setCurrentUserCode('')
       setErrorContext(null)
     }
   }
@@ -210,6 +213,7 @@ function LessonPage({ lesson, navigateTo, selectedModel }) {
                   lessonId={lesson.id}
                   onTestResults={handleTestResults}
                   onError={handleError}
+                  onCodeChange={setCurrentUserCode}
                 />
               </div>
 
@@ -218,7 +222,7 @@ function LessonPage({ lesson, navigateTo, selectedModel }) {
                   <AICoachPanel
                     selectedModel={selectedModel}
                     exercise={currentExercise}
-                    userCode={''}
+                    userCode={currentUserCode}
                     testResults={testResults}
                     errorContext={errorContext}
                   />

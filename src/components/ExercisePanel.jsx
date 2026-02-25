@@ -16,7 +16,7 @@ import { getSavedCode, saveCode, markExerciseCompleted, isExerciseCompleted } fr
  *   onTestResults    — (results) => void — called when tests run
  *   onError          — (errorMsg: string|null) => void — called with compilation errors
  */
-function ExercisePanel({ exercise, lessonId, onTestResults, onError }) {
+function ExercisePanel({ exercise, lessonId, onTestResults, onError, onCodeChange }) {
   const savedCode = getSavedCode(lessonId, exercise.id)
   const [code, setCode] = useState(savedCode ?? exercise.starterCode ?? exercise.initialCode ?? '')
   const [results, setResults] = useState(null)
@@ -30,6 +30,7 @@ function ExercisePanel({ exercise, lessonId, onTestResults, onError }) {
     (value) => {
       setCode(value)
       saveCode(lessonId, exercise.id, value)
+      if (onCodeChange) onCodeChange(value)
       // Clear previous results when user starts editing
       if (results !== null) {
         setResults(null)
@@ -38,7 +39,7 @@ function ExercisePanel({ exercise, lessonId, onTestResults, onError }) {
         if (onError) onError(null)
       }
     },
-    [lessonId, exercise.id, results, onTestResults, onError]
+    [lessonId, exercise.id, results, onTestResults, onError, onCodeChange]
   )
 
   const handleRun = async () => {
