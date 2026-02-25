@@ -108,7 +108,7 @@ function Navigation({ currentView, navigateTo, selectedModel, onModelChange }) {
             >
               {AVAILABLE_MODELS.map((model) => (
                 <option key={model.id} value={model.id}>
-                  {model.name}
+                  {model.recommended ? `★ ${model.name}` : model.name}
                 </option>
               ))}
             </select>
