@@ -209,26 +209,59 @@ const SYSTEM_PROMPT =
   'Provide hints, not complete solutions. Keep responses under 150 words. ' +
   'If you show code, keep it short and focused on the concept.'
 
-/**
- * Build a chat-style message array for hint generation.
- */
 /** Strip HTML tags from instructions so they're readable in plain text prompts. */
 function stripHtml(html) {
   return (html ?? '').replace(/<[^>]+>/g, ' ').replace(/\s{2,}/g, ' ').trim()
 }
 
+/**
+ * Trim a string to at most maxChars characters, appending '…' if trimmed.
+ * @param {string} str
+ * @param {number} maxChars
+ * @returns {string}
+ */
+function truncate(str, maxChars) {
+  if (!str) return ''
+  return str.length <= maxChars ? str : str.slice(0, maxChars) + '…'
+}
+
+/**
+ * Build a compact, token-efficient exercise summary string.
+ * Omits testCases to keep the prompt short.
+ * @param {object} exercise
+ * @returns {string}
+ */
+function summarizeExercise(exercise) {
+  return [
+    `Exercise: ${exercise.title}`,
+    `Description: ${exercise.description}`,
+    exercise.inputSpec  ? `Input: ${exercise.inputSpec}` : '',
+    exercise.outputSpec ? `Returns: ${exercise.outputSpec}` : '',
+    exercise.instructions ? `Instructions: ${truncate(stripHtml(exercise.instructions), 180)}` : '',
+  ]
+    .filter(Boolean)
+    .join('\n')
+}
+
+/**
+ * Trim the user's code to at most maxChars characters.
+ * @param {string} code
+ * @param {number} [maxChars=500]
+ * @returns {string}
+ */
+function truncateCode(code, maxChars = 500) {
+  return truncate(code, maxChars)
+}
+
+/**
+ * Build a chat-style message array for hint generation.
+ */
 function buildHintMessages(exercise, userCode, errorContext) {
   const exerciseInfo = [
-    `Exercise: ${exercise.title}`,
-    exercise.difficulty ? `Difficulty: ${exercise.difficulty}` : '',
-    `Description: ${exercise.description}`,
-    exercise.inputSpec  ? `Input:   ${exercise.inputSpec}` : '',
-    exercise.outputSpec ? `Returns: ${exercise.outputSpec}` : '',
-    exercise.instructions ? `Instructions: ${stripHtml(exercise.instructions)}` : '',
-    exercise.testCases?.length
-      ? `Tests the student must pass:\n${exercise.testCases.map((t) => `  - ${t.description}`).join('\n')}`
-      : '',
-    userCode ? `Student's current code:\n\`\`\`js\n${userCode}\n\`\`\`` : 'The student has not written any code yet.',
+    summarizeExercise(exercise),
+    userCode
+      ? `Student's current code:\n\`\`\`js\n${truncateCode(userCode)}\n\`\`\``
+      : 'The student has not written any code yet.',
     errorContext ? `Error or issue: ${errorContext}` : '',
   ]
     .filter(Boolean)
@@ -255,13 +288,8 @@ function buildEvaluationMessages(exercise, userCode, testResults) {
     .join('\n')
 
   const exerciseInfo = [
-    `Exercise: ${exercise.title}`,
-    exercise.difficulty ? `Difficulty: ${exercise.difficulty}` : '',
-    `Description: ${exercise.description}`,
-    exercise.inputSpec  ? `Input:   ${exercise.inputSpec}` : '',
-    exercise.outputSpec ? `Returns: ${exercise.outputSpec}` : '',
-    exercise.instructions ? `Instructions: ${stripHtml(exercise.instructions)}` : '',
-    `Student code:\n\`\`\`js\n${userCode}\n\`\`\``,
+    summarizeExercise(exercise),
+    `Student code:\n\`\`\`js\n${truncateCode(userCode)}\n\`\`\``,
     `Test results (${passedCount}/${totalCount} passed):\n${resultsSummary}`,
     passedCount === totalCount
       ? 'All tests passed! Please give positive feedback and one tip to improve the code quality.'
